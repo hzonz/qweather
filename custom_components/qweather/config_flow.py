@@ -1,18 +1,21 @@
-
 """Adds config flow for Qweather."""
 import logging
 import requests
 import json
-import sys
 import time
 import jwt
+import re
+import voluptuous as vol
+from collections import OrderedDict
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519
+
+from homeassistant import config_entries
+from homeassistant.core import callback
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import CONF_HOST, CONF_API_KEY, CONF_NAME
 
-from collections import OrderedDict
-from homeassistant import config_entries
-from homeassistant.core import callback
 from .const import (
     DOMAIN,
     CONF_USE_TOKEN,
@@ -28,164 +31,231 @@ from .const import (
     CONF_PROJECT_ID,
     CONF_KEY_ID,
     CONF_PRIVATE_KEY,
-    )
-import voluptuous as vol
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 @config_entries.HANDLERS.register(DOMAIN)
 class QweatherlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+    VERSION = 1
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        """Get the options flow for this handler."""
         return QweatherOptionsFlow(config_entry)
 
     def __init__(self):
         """Initialize."""
         self._errors = {}
-    
-    def generate_jwt(self, config):
+        self.data_schema_step1 = {}
+        self._generated_private_key = None
+        self._generated_public_key = None 
+
+    def _generate_key_pair(self):
+        try:
+            private_key = ed25519.Ed25519PrivateKey.generate()
+            private_bytes = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+            public_key = private_key.public_key()
+            public_bytes = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+            return private_bytes.decode('utf-8'), public_bytes.decode('utf-8')
+        except Exception as e:
+            _LOGGER.error("密钥生成失败: %s", e)
+            return None, None
+
+    def generate_jwt(self, pid, kid, private_key_pem):
         try:
             payload = {
                 'iat': int(time.time()) - 30,
                 'exp': int(time.time()) + 900,
-                'sub': config[CONF_PROJECT_ID]
+                'sub': pid
             }
-            headers = {'kid': config[CONF_KEY_ID]}
+            headers = {'kid': kid}
             return jwt.encode(
                 payload,
-                config[CONF_PRIVATE_KEY],
+                private_key_pem,
                 algorithm='EdDSA',
                 headers=headers
             )
         except Exception as e:
-            _LOGGER.error("生成JWT失败: %s", e)
+            _LOGGER.error("JWT 生成失败: %s", e)
             return None
             
-    def get_data(self, url, config):
-        headers = {}
-        if config[CONF_USE_TOKEN]:
-            jwt_token = self.generate_jwt(config)
-            if not jwt_token:
-                return None
-            headers = {"Authorization": f"Bearer {jwt_token}"}
-        else:
-            headers = {"X-QW-Api-Key": config[CONF_API_KEY]}
-        
+    def get_data(self, url, headers):
         try:
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=(3, 5))
+            if response.status_code in [401, 403]:
+                return {"code": str(response.status_code)}
+                
             response.raise_for_status()
             return response.json()
+        except requests.exceptions.ConnectTimeout:
+            return {"code": "timeout"}
+        except requests.exceptions.ReadTimeout:
+            return {"code": "timeout"}
         except requests.exceptions.RequestException as e:
-            _LOGGER.error("请求失败: %s", e)
+            _LOGGER.error("API请求失败: %s", e)
             return None
 
-    async def async_step_user(self, user_input={}):
+    async def async_step_user(self, user_input=None):
         self._errors = {}
+        
         if user_input is not None:
-            # Check if entered host is already in HomeAssistant
-            existing = await self._check_existing(user_input[CONF_NAME])
-            if existing:
-                return self.async_abort(reason="already_configured")
-                
-            if user_input[CONF_USE_TOKEN]:
-                missing = []
-                if not user_input.get(CONF_PROJECT_ID):
-                    missing.append("项目ID")
-                if not user_input.get(CONF_KEY_ID):
-                    missing.append("密钥ID")
-                if not user_input.get(CONF_PRIVATE_KEY):
-                    missing.append("私钥")
-                
-                if missing:
-                    self._errors["base"] = f"缺少JWT参数: {', '.join(missing)}"
-                    return await self._show_config_form(user_input)
-
-            url = f"https://{user_input[CONF_HOST]}/v7/weather/now?location={user_input[CONF_LOCATION]}&lang=zh&unit=m"
+            self.data_schema_step1 = user_input
             
-            # 获取天气数据
-            redata = await self.hass.async_add_executor_job(
-                self.get_data, url, user_input
-            )
-            
-            if not redata or redata.get('code') != "200":
-                self._errors["base"] = "communication"
-                _LOGGER.debug("API响应: %s", redata)
+            if user_input.get(CONF_USE_TOKEN):
+                return await self.async_step_jwt_setup()
             else:
-                await self.async_set_unique_id(f"qweather_{user_input['location'].replace(".","_")}")
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title=user_input[CONF_NAME], data=user_input
+                return await self._verify_and_create_entry(
+                    user_input.get(CONF_API_KEY, ""), 
+                    is_jwt=False
                 )
 
-            return await self._show_config_form(user_input)
+        return self._show_step_user_form(user_input)
 
-        return await self._show_config_form(user_input)
-
-    async def _show_config_form(self, user_input=None):
+    def _show_step_user_form(self, user_input=None):
+        default_location = f"{round(self.hass.config.longitude, 2)},{round(self.hass.config.latitude, 2)}"
         if user_input is None:
             user_input = {}
 
-        base_schema = {
-            vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, "api.qweather.com")): str,
-            vol.Required(CONF_USE_TOKEN, default=user_input.get(CONF_USE_TOKEN, False)): bool,
-            vol.Optional(CONF_LOCATION, 
-                default=user_input.get(CONF_LOCATION, 
-                    f"{round(self.hass.config.longitude,2)},{round(self.hass.config.latitude,2)}")
-            ): str,
-            vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "天气")): str,
-        }
-        
-
-        if user_input.get(CONF_USE_TOKEN, False):
-            token_schema = {
-                vol.Required(CONF_PROJECT_ID, default=user_input.get(CONF_PROJECT_ID, "")): str,
-                vol.Required(CONF_KEY_ID, default=user_input.get(CONF_KEY_ID, "")): str,
-                vol.Required(CONF_PRIVATE_KEY, default=user_input.get(CONF_PRIVATE_KEY, "")): str,
-            }
-            data_schema = {**base_schema, **token_schema}
-        else:
-            api_key_schema = {
-                vol.Required(CONF_API_KEY, default=user_input.get(CONF_API_KEY, "请修改，使用JWT模式时可忽略")): str,
-            }
-            data_schema = {**base_schema, **api_key_schema}
+        schema = OrderedDict()
+        schema[vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, "api.qweather.com"))] = str
+        schema[vol.Required(CONF_USE_TOKEN, default=user_input.get(CONF_USE_TOKEN, False))] = bool
+        schema[vol.Optional(CONF_LOCATION, default=user_input.get(CONF_LOCATION, default_location))] = str
+        schema[vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "和风天气"))] = str
+        schema[vol.Optional(CONF_API_KEY, default=user_input.get(CONF_API_KEY, ""))] = str
 
         return self.async_show_form(
             step_id="user", 
-            data_schema=vol.Schema(data_schema), 
+            data_schema=vol.Schema(schema), 
             errors=self._errors
         )
 
-    async def async_step_import(self, user_input):
-        """Import a config entry.
+    async def async_step_jwt_setup(self, user_input=None):
+        self._errors = {}
 
-        Special type of import, we're not actually going to store any data.
-        Instead, we're going to rely on the values that are in config file.
-        """
+        if self._generated_private_key is None:
+            private_key, public_key = await self.hass.async_add_executor_job(self._generate_key_pair)
+            if not private_key:
+                return self.async_abort(reason="key_generation_failed")
+            self._generated_private_key = private_key
+            self._generated_public_key = public_key
+
+        if user_input is not None:
+            final_data = {**self.data_schema_step1, **user_input}
+            final_data[CONF_PRIVATE_KEY] = self._generated_private_key
+            
+            token = self.generate_jwt(
+                user_input[CONF_PROJECT_ID],
+                user_input[CONF_KEY_ID],
+                self._generated_private_key
+            )
+            
+            if token:
+                return await self._verify_and_create_entry(token, is_jwt=True, config_data=final_data)
+            else:
+                self._errors["base"] = "jwt_generation_failed"
+
+        return self._show_step_jwt_form(user_input)
+
+    def _show_step_jwt_form(self, user_input=None):
+        if user_input is None:
+            user_input = {}
+            
+        public_key_display = f"```\n{self._generated_public_key}\n```"
+        
+        schema = OrderedDict()
+        schema[vol.Required(CONF_PROJECT_ID, default=user_input.get(CONF_PROJECT_ID, ""))] = str
+        schema[vol.Required(CONF_KEY_ID, default=user_input.get(CONF_KEY_ID, ""))] = str
+
+        return self.async_show_form(
+            step_id="jwt_setup",
+            data_schema=vol.Schema(schema),
+            errors=self._errors,
+            description_placeholders={
+                "public_key": public_key_display
+            }
+        )
+
+    async def _verify_and_create_entry(self, credential, is_jwt=False, config_data=None):
+
+        if config_data is None:
+            data = self.data_schema_step1
+        else:
+            data = config_data
+
+        location = data.get(CONF_LOCATION, "")
+        
+        if is_jwt:
+            headers = {"Authorization": f"Bearer {credential}"}
+        else:
+            if not credential:
+                self._errors["base"] = "api_key_missing"
+                return self._show_step_user_form(data)
+            data[CONF_API_KEY] = credential
+            headers = {"X-QW-Api-Key": credential}
+
+        if not re.match(r"^-?\d+\.?\d*,-?\d+\.?\d*$", location.replace(" ", "")):
+            geo_url = f"https://geoapi.qweather.com/v2/city/lookup?location={location}&lang=zh"
+            geo_data = await self.hass.async_add_executor_job(self.get_data, geo_url, headers)
+            
+            if geo_data and geo_data.get('code') == "200" and geo_data.get('location'):
+                loc_info = geo_data['location'][0]
+                new_location = f"{loc_info['lon']},{loc_info['lat']}"
+                data[CONF_LOCATION] = new_location
+                _LOGGER.info("位置已自动转换: %s -> %s", location, new_location)
+            else:
+                error_code = geo_data.get('code') if geo_data else 'unknown'
+                if error_code in ["401", "403"]:
+                    self._errors["base"] = "auth_failed"
+                elif error_code == "timeout":
+                    self._errors["base"] = "connect_timeout"
+                else:
+                    self._errors["base"] = "location_not_found"
+
+                return self._show_step_jwt_form(data) if is_jwt else self._show_step_user_form(data)
+
+        test_url = f"https://{data[CONF_HOST]}/v7/weather/now?location={data[CONF_LOCATION]}&lang=zh"
+        redata = await self.hass.async_add_executor_job(self.get_data, test_url, headers)
+
+        if not redata or redata.get('code') != "200":
+            code = redata.get('code', 'connect_fail') if redata else 'connect_fail'
+            
+            if code in ["401", "403"]:
+                self._errors["base"] = "auth_failed"
+            elif code == "timeout":
+                self._errors["base"] = "connect_timeout"
+            elif code == "400": 
+                self._errors["base"] = "invalid_params" 
+            else:
+                self._errors["base"] = f"api_error_{code}"
+            
+            return self._show_step_jwt_form(data) if is_jwt else self._show_step_user_form(data)
+        
+        await self.async_set_unique_id(f"qw_{data[CONF_LOCATION].replace(',', '_')}")
+        self._abort_if_unique_id_configured()
+        return self.async_create_entry(title=data[CONF_NAME], data=data)
+
+    async def async_step_import(self, user_input):
         if self._async_current_entries():
             return self.async_abort(reason="single_instance_allowed")
-
         return self.async_create_entry(title="configuration.yaml", data={})
 
-    async def _check_existing(self, host):
-        for entry in self._async_current_entries():
-            if host == entry.data.get(CONF_NAME):
-                return True
 
 class QweatherOptionsFlow(config_entries.OptionsFlow):
-    """Config flow options for Qweather."""
-
     def __init__(self, config_entry):
-        """Initialize Qweather options flow."""
         self._config = dict(config_entry.data)
 
     async def async_step_init(self, user_input=None):
-        """Manage the options."""
         return await self.async_step_user()
 
     async def async_step_user(self, user_input=None):
-        """Handle a flow initialized by the user."""
         if user_input is not None:
             self._config.update(user_input)
             self.hass.config_entries.async_update_entry(
@@ -210,7 +280,7 @@ class QweatherOptionsFlow(config_entries.OptionsFlow):
                     vol.Optional(
                         CONF_HOURLYSTEPS,
                         default=self.config_entry.options.get(CONF_HOURLYSTEPS, 24),
-                    ): vol.All(vol.Coerce(int), vol.Range(min=24, max=72)),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=24, max=168)),
                     vol.Optional(
                         CONF_ALERT,
                         default=self.config_entry.options.get(CONF_ALERT, True),
@@ -230,4 +300,3 @@ class QweatherOptionsFlow(config_entries.OptionsFlow):
                 }
             ),
         )
-
