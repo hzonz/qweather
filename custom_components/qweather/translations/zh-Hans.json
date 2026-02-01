@@ -1,47 +1,60 @@
 {
     "config": {
-        "title": "和风天气",
         "step": {
             "user": {
-                "title": "和风天气",
-                "description": "如果您需要配置方面的帮助，请查看此处: https://github.com/dscao/qweather \n 注意：信息获取次数有限制，请自行申请appkey \n [申请地址](https://dev.qweather.com/) ，申请后，请认证为个人开发者，新建一个使用Web API项目，获取key。 \n\n location id或经度,纬度（经度在前纬度在后，英文逗号分隔，十进制格式，北纬东经为正，南纬西经为负）。例如：location=116.41,39.92 \n\n中国大陆地区应使用GCJ-02坐标系，在其他地区应使用WGS-84坐标系。\n[在线坐标系转换工具](https://atool.vip/lnglat/)",
+                "title": "和风天气 - 配置",
+                "description": "如果您选择 **JWT 认证**，请**不要**填写 API Key，直接勾选下方开关并点击提交。\n\n普通用户请直接填写 API Key。\n\n如果您需要配置方面的帮助，请查看此处: https://github.com/dscao/qweather \n 注意：信息获取次数有限制，请自行申请appkey \n [申请地址](https://dev.qweather.com/) ，申请后，请认证为个人开发者，新建一个使用Web API项目，获取key。 \n\n location id或经度,纬度（经度在前纬度在后，英文逗号分隔，十进制格式，北纬东经为正，南纬西经为负）。例如：location=116.41,39.92 \n\n中国大陆地区应使用GCJ-02坐标系，在其他地区应使用WGS-84坐标系。\n[在线坐标系转换工具](https://atool.vip/lnglat/)",
                 "data": {
-                    "host": "API Host",
-                    "api_key": "API Key",
-                    "use_token": "使用 JSON Web Token 方式",
-                    "project_id": "项目ID",
-                    "key_id": "凭据ID",
-                    "private_key": "私钥",
-                    "api_version": "API版本,默认是v7,请不要修改",
-                    "latitude" : "维度（保留两位小数）",
-                    "longitude" : "经度（保留两位小数）",
-                    "location" : "location ID, 例如 101010100 或 116.41,39.92",
-                    "name" : "名称(不可重复配置相同名称)"
+                    "host": "API 主机 (默认 api.qweather.com)",
+                    "use_token": "启用 JWT 认证 (推荐企业/付费用户)",
+                    "location": "位置 (Location ID 或 纬度,经度)",
+                    "name": "集成名称",
+                    "api_key": "API Key (普通模式必填)"
+                }
+            },
+            "jwt_setup": {
+                "title": "JWT 密钥配置",
+                "description": "系统已自动生成 Ed25519 密钥对。\n\n**您的公钥 (Public Key)：**\n{public_key}\n\n**操作步骤：**\n1. 复制上方公钥内容。\n2. 前往 [和风天气控制台](https://console.qweather.com/)，在“项目管理”中创建项目。\n3. 在项目中添加“凭据”，选择 **公钥模式 (Public Key)**。\n4. 将公钥粘贴到控制台并保存。\n5. 将获取到的 **项目ID** 和 **凭据ID** 填入下方。",
+                "data": {
+                    "project_id": "项目 ID (Project ID)",
+                    "key_id": "凭据 ID (Key ID)"
                 }
             }
         },
         "error": {
-            "communication": "Key可能无效，请检查输入值."
+            "location_not_found": "无法找到该位置，请尝试使用“纬度,经度”格式。",
+            "auth_failed": "认证失败 (401/403)，请检查 Project ID、Key ID 或 公钥是否正确。",
+            "connect_timeout": "连接超时，请检查网络或 API 主机地址。",
+            "invalid_params": "参数无效 (400)，请检查 Project ID 或 Key ID 是否包含空格。",
+            "api_key_missing": "未启用 JWT 模式时，必须填写 API Key。",
+            "jwt_generation_failed": "JWT 生成失败，请重试。",
+            "key_generation_failed": "密钥生成失败，请检查系统环境。",
+            "connect_fail": "连接失败，无法获取数据。",
+            "api_error_401": "认证失败 (401)，请检查 Key 或 权限。",
+            "api_error_403": "无权访问 (403)，请检查套餐额度。",
+            "api_error_404": "数据不存在 (404)，请检查位置 ID。",
+            "already_configured": "该位置/名称已配置，请勿重复添加。"
         },
         "abort": {
-            "single_instance_allowed": "仅允许单个配置.",
-            "already_configured": "请勿重复配置."
+            "single_instance_allowed": "仅允许单个配置。",
+            "already_configured": "请勿重复配置。"
         }
     },
     "options": {
         "step": {
-            "user":{
+            "user": {
+                "title": "和风天气 - 选项",
+                "description": "修改后需要重载集成才会生效。",
                 "data": {
-                    "dailysteps": "天级预报(3、7)，免费订阅必须为3或7,卡片最佳显示7。",
-                    "hourlysteps": "小时级预报(24)，免费订阅必须是24",
-                    "alert": "极端天气预警",
-					"life": "生活指数",
-                    "custom_ui": "天气实体使用自定义UI，否则使用系统UI",
-                    "starttime": "预报起始时间,-1 是昨天,-2 是前天，默认为0 是今天",
-					"update_interval_minutes": "刷新间隔时间(5-1440 分钟),默认10分种",
-					"grid_weather": "启用格点天气，不选中则使用城市天气。location填写的是坐标才能生效。格点天气：基于全球任意坐标的高精度天气，精确到3-5公里范围。"
-                },
-                "description": "设置你需要获取预报数据的参数，提交后需要重载集成才会生效。"
+                    "dailysteps": "天级预报天数 (3-15天)",
+                    "hourlysteps": "小时级预报时长 (24-168小时)",
+                    "alert": "启用灾害预警",
+                    "life": "启用生活指数",
+                    "custom_ui": "启用自定义 UI 属性支持",
+                    "starttime": "预报起始偏移 (-1为昨天, 0为今天)",
+                    "update_interval_minutes": "刷新间隔 (分钟)",
+                    "grid_weather": "启用格点天气"
+                }
             }
         }
     }
