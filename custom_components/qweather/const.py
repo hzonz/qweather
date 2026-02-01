@@ -1,4 +1,4 @@
-VERSION = '2026.1.31'
+VERSION = '2026.2.1'
 ROOT_PATH = '/qweather-local'
 DEFAULT_NAME = "和风天气"
 DOMAIN = "qweather"
@@ -77,4 +77,5 @@ SUGGESTIONTPYE2NAME = {
     '15': '交通指数',
     '16': '防晒指数',
 }
+
 
