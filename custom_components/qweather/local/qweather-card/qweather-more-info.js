@@ -1,269 +1,389 @@
-console.info("%c  WEATHER CARD Extends \n%c  Version 2023.6.26 ",
+console.info("%c  QWEATHER MORE INFO \n%c  Version 2026.02.01.NativeStyle ",
 "color: orange; font-weight: bold; background: black", 
 "color: white; font-weight: bold; background: dimgray");
 
 import {
-LitElement,
-html,
-css
+  LitElement,
+  html,
+  css
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-
 class MoreInfoWeather extends LitElement {
-	static get properties() {
-	  return {
-		hass: Object,
-		stateObj: Object,
-	  };
-	}
+  static get properties() {
+    return {
+      hass: Object,
+      stateObj: Object,
+      _forecast: Array,       // 每日预报数据
+      _forecastHourly: Array, // 小时预报数据
+      _subscribing: Boolean,
+      _selectedTab: String    // 'daily' or 'hourly'
+    };
+  }
 
-	constructor() {
-	  super();
-	  this.cardinalDirections = [
-		"N",
-		"NNE",
-		"NE",
-		"ENE",
-		"E",
-		"ESE",
-		"SE",
-		"SSE",
-		"S",
-		"SSW",
-		"SW",
-		"WSW",
-		"W",
-		"WNW",
-		"NW",
-		"NNW",
-		"N",
-	  ];
-	  this.weatherIcons = {
-		"clear-night": "hass:weather-night",
-		"cloudy": "hass:weather-cloudy",
-		"exceptional": "hass:alert-circle-outline",
-		"fog": "hass:weather-fog",
-		"hail": "hass:weather-hail",
-		"lightning": "hass:weather-lightning",
-		"lightning-rainy": "hass:weather-lightning-rainy",
-		"partlycloudy": "hass:weather-partly-cloudy",
-		"pouring": "hass:weather-pouring",
-		"rainy": "hass:weather-rainy",
-		"snowy": "hass:weather-snowy",
-		"snowy-rainy": "hass:weather-snowy-rainy",
-		"sunny": "hass:weather-sunny",
-		"windy": "hass:weather-windy",
-		"windy-variant": "hass:weather-windy-variant"
-	  };
-	}
-	ll(str) {
-	  if (locale[this.lang] === undefined)
-		return locale.en[str];
-	  return locale[this.lang][str];
-	}
-	computeDate(data) {
-	  const date = new Date(data);
-	  return date.toLocaleDateString(this.hass.language, {
-		weekday: "long",
-		month: "short",
-		day: "numeric",
-	  });
-	}
+  constructor() {
+    super();
+    this._forecast = [];
+    this._forecastHourly = [];
+    this._subscribing = false;
+    this._selectedTab = 'daily'; // 默认显示每日
+    this.weatherIcons = {
+      "clear-night": "hass:weather-night",
+      "cloudy": "hass:weather-cloudy",
+      "exceptional": "hass:alert-circle-outline",
+      "fog": "hass:weather-fog",
+      "hail": "hass:weather-hail",
+      "lightning": "hass:weather-lightning",
+      "lightning-rainy": "hass:weather-lightning-rainy",
+      "partlycloudy": "hass:weather-partly-cloudy",
+      "pouring": "hass:weather-pouring",
+      "rainy": "hass:weather-rainy",
+      "snowy": "hass:weather-snowy",
+      "snowy-rainy": "hass:weather-snowy-rainy",
+      "sunny": "hass:weather-sunny",
+      "windy": "hass:weather-windy",
+      "windy-variant": "hass:weather-windy-variant"
+    };
+  }
 
-	computeDateTime(data) {
-	  const date = new Date(data);
-	  return date.toLocaleDateString(this.hass.language, {
-		weekday: "long",
-		hour: "numeric",
-	  });
-	}
+  // 样式复刻 HA 原生弹窗
+  static get styles() {
+    return css`
+      :host {
+        font-family: var(--paper-font-body1_-_font-family);
+        -webkit-font-smoothing: var(--paper-font-body1_-_-webkit-font-smoothing);
+        font-size: var(--paper-font-body1_-_font-size);
+        font-weight: var(--paper-font-body1_-_font-weight);
+        line-height: var(--paper-font-body1_-_line-height);
+      }
+      
+      ha-icon {
+        color: var(--paper-item-icon-color);
+      }
 
-	getUnit(measure) {
-	  const lengthUnit = this.hass.config.unit_system.length || "";
-	  switch (measure) {
-		case "air_pressure":
-		  return lengthUnit === "km" ? "hPa" : "inHg";
-		case "length":
-		  return lengthUnit;
-		case "precipitation":
-		  return lengthUnit === "km" ? "mm" : "in";
-		default:
-		  return this.hass.config.unit_system[measure] || "";
-	  }
-	}
+      /* 头部样式：大图标+状态 */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+      }
+      .weather-icon {
+        width: 64px;
+        height: 64px;
+        margin-right: 16px;
+        border-radius: 50%;
+        background-color: var(--secondary-background-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .weather-icon ha-icon {
+        width: 42px;
+        height: 42px;
+        color: var(--paper-item-icon-color);
+      }
+      .weather-icon img {
+        width: 42px;
+        height: 42px;
+      }
+      .condition-state {
+        font-size: 28px;
+        font-weight: 400;
+      }
+      .condition-time {
+        color: var(--secondary-text-color);
+        font-size: 14px;
+      }
+      .header-right {
+        text-align: right;
+      }
+      .current-temp {
+        font-size: 42px;
+        line-height: 1;
+        font-weight: 400;
+      }
+      .current-temp span {
+        font-size: 20px;
+        vertical-align: top;
+        margin-left: 2px;
+      }
 
-	windBearingToText(degree) {
-	  const degreenum = parseInt(degree);
-	  if (isFinite(degreenum)) {
-		return this.cardinalDirections[(((degreenum + 11.25) / 22.5) | 0) % 16];
-	  }
-	  return degree;
-	}
+      /* 属性列表 */
+      .attributes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .attribute-item {
+        display: flex;
+        align-items: center;
+      }
+      .attribute-item ha-icon {
+        margin-right: 16px;
+        color: var(--secondary-text-color);
+      }
+      .attribute-name {
+        color: var(--secondary-text-color);
+        margin-right: 8px;
+      }
+      .attribute-value {
+        color: var(--primary-text-color);
+      }
 
-	getWind(speed, bearing, localize) {
-	  if (bearing != null) {
-		const cardinalDirection = this.windBearingToText(bearing);
-		return `${speed} ${this.getUnit("length")}/h (${localize(
-		  `ui.card.weather.cardinal_direction.${cardinalDirection.toLowerCase()}`
-		) || cardinalDirection})`;
-	  }
-	  return `${speed} ${this.getUnit("length")}/h`;
-	}
+      /* 预警区域 */
+      .warning-section {
+        background-color: var(--error-color);
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: flex-start;
+      }
+      .warning-section ha-icon {
+        color: white;
+        margin-right: 12px;
+      }
 
-	getWeatherIcon(condition) {
-	  return this.weatherIcons[condition];
-	}
+      /* 生活指数区域 */
+      .suggestion-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        background: var(--secondary-background-color);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+      }
+      .suggestion-item {
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .suggestion-label {
+        color: var(--secondary-text-color);
+      }
 
-	_showValue(item) {
-	  return typeof item !== "undefined" && item !== null;
-	}
-	
-	render() {
-		return html`
-		<style>
-        ha-icon {
-          color: var(--paper-item-icon-color);
-        }
-        .section {
-          margin: 16px 0 8px 0;
-          font-size: 1.2em;
-        }
+      /* 预报 Tab 栏 */
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--divider-color);
+        margin-bottom: 16px;
+      }
+      .tab {
+        padding: 12px 24px;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--secondary-text-color);
+        border-bottom: 2px solid transparent;
+      }
+      .tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+      }
 
-        .flex {
-          display: flex;
-          height: 32px;
-          align-items: center;
-        }
-        .suggestion_brf {
-          color: #44739e;
-          justify-content: space-between;
-          display: flex;
-          align-items: center;
-          margin-top: 5px;
-        }
-        .suggestion_txt {
-          margin-left:10px;
-        }
-        .main {
-          flex: 1;
-          margin-left: 24px;
-        }
+      /* 预报列表 */
+      .forecast-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--divider-color);
+      }
+      .forecast-item:last-child {
+        border-bottom: none;
+      }
+      .forecast-time {
+        width: 100px;
+        font-weight: 500;
+      }
+      .forecast-icon {
+        flex: 1;
+        text-align: center;
+      }
+      .forecast-icon img {
+        width: 32px;
+        height: 32px;
+        vertical-align: middle;
+      }
+      .forecast-temp {
+        width: 100px;
+        text-align: right;
+        font-weight: 500;
+      }
+      .forecast-low {
+        color: var(--secondary-text-color);
+        margin-left: 8px;
+      }
+    `;
+  }
 
-        .temp,
-        .templow {
-          min-width: 48px;
-          text-align: right;
-        }
+  updated(changedProperties) {
+    if (changedProperties.has("stateObj") && this.stateObj) {
+      this._subscribeForecast();
+    }
+  }
 
-        .templow {
-          margin: 0 16px;
-          color: var(--secondary-text-color);
-        }
+  async _subscribeForecast() {
+    if (!this.hass || !this.stateObj || this._subscribing) return;
+    const entity_id = this.stateObj.entity_id;
+    this._subscribing = true;
 
-        .attribution {
-          color: var(--secondary-text-color);
-          text-align: center;
-        }
-      </style>
-		  <div class="flex">
-			<ha-icon icon="hass:thermometer"></ha-icon>
-			<div class="main">
-			  温度
-			</div>
-			<div>
-			  ${this.stateObj.attributes.temperature} ${this.stateObj.attributes.temperature_unit}
-			</div>
-		  </div>
-		  ${this._showValue(this.stateObj.attributes.pressure) ? html`
-			<div class="flex">
-			  <ha-icon icon="hass:gauge"></ha-icon>
-			  <div class="main">
-				气压
-			  </div>
-			  <div>
-				${this.stateObj.attributes.pressure} ${this.getUnit('air_pressure')}
-			  </div>
-			</div>
-		  ` : ''}
-		  ${this._showValue(this.stateObj.attributes.humidity) ? html`
-			<div class="flex">
-			  <ha-icon icon="hass:water-percent"></ha-icon>
-			  <div class="main">
-				湿度
-			  </div>
-			  <div>${this.stateObj.attributes.humidity} %</div>
-			</div>
-		  ` : ''}
-		  ${this._showValue(this.stateObj.attributes.wind_speed) ? html`
-			<div class="flex">
-			  <ha-icon icon="hass:weather-windy"></ha-icon>
-			  <div class="main">
-				风速
-			  </div>
-			  <div>
-				${this.stateObj.attributes.wind_speed} ${this.stateObj.attributes.wind_speed_unit}
-			  </div>
-			</div>
-		  ` : ''}
-		  ${this._showValue(this.stateObj.attributes.visibility) ? html`
-			<div class="flex">
-			  <ha-icon icon="hass:eye"></ha-icon>
-			  <div class="main">
-				能见度
-			  </div>
-			  <div>${this.stateObj.attributes.visibility} ${this.stateObj.attributes.visibility_unit}</div>
-			</div>
-		  ` : ''}
-		  ${this.stateObj.attributes.warning ? html`
-			<div class="section">气象预警:</div>
-			${this.stateObj.attributes.warning.map(
-				(item) => html`
-				  <div class="suggestion_brf">
-					<div>-&nbsp;&nbsp;${item.title}</div>
-					<div>${item.typeName}</div>
-				  </div>
-			  <div class="suggestion_txt">${item.text}</div>
-				`,
-			  )}	
-		  ` : ''}
-		  ${this.stateObj.attributes.suggestion ? html`
-			<div class="section">生活指数:</div>
-			${this.stateObj.attributes.suggestion.map(
-				(item) => html`
-				  <div class="suggestion_brf">
-					<div>-&nbsp;&nbsp;${item.title_cn}</div>
-					<div>${item.brf}</div>
-				  </div>
-			  <div class="suggestion_txt">${item.txt}</div>
-				`,
-			  )}	
-		  ` : ''}
-		  ${this.stateObj.attributes.forecast ? html`
-			<div class="section">天气预报:</div>
-			${this.stateObj.attributes.forecast.map(
-				(item) => html`
-				  <div class="flex">
-					${this._showValue(item.condition)
-					  ? html`<ha-icon icon="${this.getWeatherIcon(item.condition)}"></ha-icon>`
-					  : null}
-					${!this._showValue(item.templow)
-					  ? html`<div class="main">${this.computeDateTime(item.datetime)}</div>`
-					  : html`
-						  <div class="main">${this.computeDate(item.datetime)}</div>
-						  <div class="templow">${item.templow} ${this.stateObj.attributes.temperature_unit}</div>
-						`}
-					<div class="temp">${item.temperature} ${this.stateObj.attributes.temperature_unit}</div>
-				  </div>
-				`,
-			  )}
-		  ` : ''}
-		  ${this.stateObj.attributes.attribution ? html`
-			<div class="attribution">${this.stateObj.attributes.attribution}</div>
-		  ` : ''}
-		`;
-	  };
-	}
+    try {
+      // 订阅每日
+      this.hass.connection.subscribeMessage(
+        (msg) => {
+          this._forecast = msg.forecast;
+          this.requestUpdate();
+        },
+        { type: "weather/subscribe_forecast", entity_id: entity_id, forecast_type: "daily" }
+      );
+      // 订阅每小时
+      this.hass.connection.subscribeMessage(
+        (msg) => {
+          this._forecastHourly = msg.forecast;
+          this.requestUpdate();
+        },
+        { type: "weather/subscribe_forecast", entity_id: entity_id, forecast_type: "hourly" }
+      );
+    } catch (e) {
+      console.error("Sub error", e);
+      this._subscribing = false;
+    }
+  }
+
+  getUnit(measure) {
+    return this.hass.config.unit_system[measure] || "";
+  }
+
+  gethfIconurl(icon) {
+    return `/qweather-local/qweather-card/icons/${icon}.svg`
+  }
+  
+  _setTab(tab) {
+    this._selectedTab = tab;
+    this.requestUpdate();
+  }
+
+  _formatDate(datetime) {
+    const d = new Date(datetime);
+    const now = new Date();
+    if (d.getDate() === now.getDate()) return "今天";
+    return d.toLocaleDateString(this.hass.language, { weekday: "long" });
+  }
+
+  _formatTime(datetime) {
+    const d = new Date(datetime);
+    return d.toLocaleTimeString(this.hass.language, { hour: 'numeric', minute: '2-digit', hour12: false });
+  }
+
+  render() {
+    if (!this.stateObj) return html``;
+    const attr = this.stateObj.attributes;
+    const tempUnit = attr.temperature_unit;
+    const forecast = this._selectedTab === 'daily' ? (this._forecast || []) : (this._forecastHourly || []);
+
+    return html`
+      <div class="header">
+        <div class="header-left">
+          <div class="weather-icon">
+            ${attr.qweather_icon 
+              ? html`<img src="${this.gethfIconurl(attr.qweather_icon)}" alt="">`
+              : html`<ha-icon icon="${this.weatherIcons[this.stateObj.state] || 'mdi:weather-partly-cloudy'}"></ha-icon>`
+            }
+          </div>
+          <div>
+            <div class="condition-state">${attr.condition_cn || this.stateObj.state}</div>
+            <div class="condition-time">${attr.update_time || ''}</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="current-temp">${attr.temperature}<span>${tempUnit}</span></div>
+        </div>
+      </div>
+
+      <div class="attributes-grid">
+        ${this._renderAttribute('hass:water-percent', '湿度', `${attr.humidity} %`)}
+        ${this._renderAttribute('hass:gauge', '气压', `${attr.pressure} hPa`)}
+        ${this._renderAttribute('hass:weather-windy', '风速', `${attr.wind_speed} ${this.getUnit('length')}/h`)}
+        ${this._renderAttribute('hass:eye', '能见度', `${attr.visibility} km`)}
+      </div>
+
+      ${attr.warning && attr.warning.length > 0 ? html`
+        ${attr.warning.map(w => html`
+          <div class="warning-section">
+            <ha-icon icon="mdi:alert-circle"></ha-icon>
+            <div>
+              <div style="font-size: 14px;">${w.title}</div>
+              <div style="font-size: 12px; font-weight: normal; margin-top: 4px;">${w.text}</div>
+            </div>
+          </div>
+        `)}
+      ` : ''}
+
+      ${attr.suggestion ? html`
+        <div class="suggestion-grid">
+          ${attr.suggestion.map(s => html`
+            <div class="suggestion-item">
+              <span class="suggestion-label">${s.title_cn}</span>
+              <span>${s.brf}</span>
+            </div>
+          `)}
+        </div>
+      ` : ''}
+
+      <div class="tabs">
+        <div class="tab ${this._selectedTab === 'daily' ? 'active' : ''}" @click=${() => this._setTab('daily')}>
+          每日预报
+        </div>
+        <div class="tab ${this._selectedTab === 'hourly' ? 'active' : ''}" @click=${() => this._setTab('hourly')}>
+          小时预报
+        </div>
+      </div>
+
+      <div class="forecast-list">
+        ${forecast.length === 0 ? html`<div style="text-align:center; padding:20px; color:var(--secondary-text-color);">加载中...</div>` : ''}
+        ${forecast.map(item => html`
+          <div class="forecast-item">
+            <div class="forecast-time">
+              ${this._selectedTab === 'daily' ? this._formatDate(item.datetime) : this._formatTime(item.datetime)}
+            </div>
+            <div class="forecast-icon">
+              <img src="${this.gethfIconurl(item.icon)}" alt="" style="width:24px; height:24px;">
+              ${this._selectedTab === 'daily' ? html`<span style="font-size:12px; margin-left:8px; color:var(--secondary-text-color)">${item.text}</span>` : ''}
+            </div>
+            <div class="forecast-temp">
+              ${item.temperature}°
+              ${this._selectedTab === 'daily' ? html`<span class="forecast-low">${item.templow}°</span>` : ''}
+            </div>
+          </div>
+        `)}
+      </div>
+      
+      ${attr.attribution ? html`<div style="text-align:center; color:var(--secondary-text-color); font-size:10px; margin-top:16px;">${attr.attribution}</div>` : ''}
+    `;
+  }
+
+  _renderAttribute(icon, label, value) {
+    if (value === undefined || value === null) return '';
+    return html`
+      <div class="attribute-item">
+        <ha-icon icon="${icon}"></ha-icon>
+        <div>
+          <div class="attribute-name">${label}</div>
+          <div class="attribute-value">${value}</div>
+        </div>
+      </div>
+    `;
+  }
+}
 
 if (!customElements.get('qweather-more-info')) {
-    customElements.define('qweather-more-info', MoreInfoWeather);
-} 
+  customElements.define('qweather-more-info', MoreInfoWeather);
+}

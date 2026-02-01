@@ -1,252 +1,20 @@
 (function (factory) {
-  typeof define === 'function' && define.amd ? define(factory) :
-  factory();
-}((function () { 'use strict';
+  typeof define === 'function' && define.amd ? define(factory) : factory();
+}((function () {
+  'use strict';
 
+  // --- 1. 本地化与图标定义 ---
   const locale = {
     'zh-Hans': {
-      'tempHi': '气温',
-      'tempLo': '夜间气温',
-      'precip': '降水量',
-	  'pop': '降水概率',
-	  'today': '今天',
-      'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
-      },
-      'cardinalDirections': [
-        '北', '北-东北', '东北', '东-东北', '东', '东-东南', '东南', '南-东南',
-        '南', '南-西南', '西南', '西-西南', '西', '西-西北', '西北', '北-西北', '北'
-      ],
-	  aqiLevels: [
-      '优', '良', '轻度污染', '中度污染', '重度污染', '严重污染'
-      ],
-      'clear-night': '晴夜',
-      'cloudy': '阴',
-      'fog': '雾',
-      'hail': '冰雹',
-      'lightning': '闪电',
-      'lightning-rainy': '闪电，下雨',
-      'partlycloudy': '多云',
-      'pouring': '暴雨',
-      'rainy': '雨',
-      'snowy': '雪',
-      'snowy-rainy': '雨夹雪',
-      'sunny': '晴',
-      'windy': '风',
-      'windy-variant': '风'
-    },
-	cs: {
-      'tempHi': 'Teplota',
-      'tempLo': 'Teplota v noci',
-      'precip': 'Srážky',
-	  'today': 'Today',
-      'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
-      },
-      'cardinalDirections': [
-        'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
-        'S', 'S-SW', 'SW', 'W-SW', 'W', 'W-NW', 'NW', 'N-NW', 'N'
-      ],
-      'clear-night': 'Jasná noc',
-      'cloudy': 'Zataženo',
-      'fog': 'Mlha',
-      'hail': 'Kroupy',
-      'lightning': 'Bouřky',
-      'lightning-rainy': 'Bouřky, déšť',
-      'partlycloudy': 'Polojasno',
-      'pouring': 'Silný déť',
-      'rainy': 'Déšť',
-      'snowy': 'Sníh',
-      'snowy-rainy': 'Sníh s deštěm',
-      'sunny': 'Jasno',
-      'windy': 'Větrno',
-      'windy-variant': 'Větrno'
-    },
-    en: {
-      'tempHi': 'Temperature',
-      'tempLo': 'Temperature night',
-      'precip': 'Precipitations',
-	  'today': 'Today',
-      'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
-      },
-      'cardinalDirections': [
-        'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
-        'S', 'S-SW', 'SW', 'W-SW', 'W', 'W-NW', 'NW', 'N-NW', 'N'
-      ],
-      'clear-night': 'Clear, night',
-      'cloudy': 'Cloudy',
-      'fog': 'Fog',
-      'hail': 'Hail',
-      'lightning': 'Lightning',
-      'lightning-rainy': 'Lightning, rainy',
-      'partlycloudy': 'Partly cloudy',
-      'pouring': 'Pouring',
-      'rainy': 'Rainy',
-      'snowy': 'Snowy',
-      'snowy-rainy': 'Snowy, rainy',
-      'sunny': 'Sunny',
-      'windy': 'Windy',
-      'windy-variant': 'Windy'
-    },
-    hu: {
-      'tempHi': 'Max. hőmérséklet',
-      'tempLo': 'Min. hőmérséklet',
-      'precip': 'Csapadék',
-	  'today': 'Today',
-      'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
-      },
-      'cardinalDirections': [
-        'É', 'É-ÉK', 'ÉK', 'K-ÉK', 'K', 'K-DK', 'DK', 'D-DK',
-        'D', 'D-DNY', 'DNY', 'NY-DNY', 'NY', 'NY-ÉNY', 'ÉNY', 'É-ÉNY', 'É'
-      ],
-      'clear-night': 'Tiszta, éjszaka',
-      'cloudy': 'Felhős',
-      'fog': 'Ködös',
-      'hail': 'Jégeső',
-      'lightning': 'Villám',
-      'lightning-rainy': 'Zivatar',
-      'partlycloudy': 'Részben felhős',
-      'pouring': 'Szakadó eső',
-      'rainy': 'Esős',
-      'snowy': 'Havas',
-      'snowy-rainy': 'Havas eső',
-      'sunny': 'Napos',
-      'windy': 'Szeles',
-      'windy-variant': 'Szeles'
-    },
-    ru: {
-      'tempHi': 'Температура',
-      'tempLo': 'Температура ночью',
-      'precip': 'Осадки',
-	  'today': 'Today',
-      'units': {
-        'km/h': 'км/ч',
-        'm/s': 'м/с',
-        'hPa': 'гПа',
-        'mmHg': 'мм рт.ст.',
-        'mm': 'мм',
-        'in': 'in'
-      },
-      'cardinalDirections': [
-        'С', 'С-СВ', 'СВ', 'В-СВ', 'В', 'В-ЮВ', 'ЮВ', 'Ю-ЮВ',
-        'Ю', 'Ю-ЮЗ', 'ЮЗ', 'З-ЮЗ', 'З', 'З-СЗ', 'СЗ', 'С-СЗ', 'С'
-      ],
-      'clear-night': 'Ясно',
-      'cloudy': 'Облачно',
-      'fog': 'Туман',
-      'hail': 'Град',
-      'lightning': 'Гроза',
-      'lightning-rainy': 'Дождь с грозой',
-      'partlycloudy': 'Переменная облачность',
-      'pouring': 'Ливень',
-      'rainy': 'Дождь',
-      'snowy': 'Снег',
-      'snowy-rainy': 'Снег с дождем',
-      'sunny': 'Ясно',
-      'windy': 'Ветрено',
-      'windy-variant': 'Ветрено'
+      'tempHi': '最高温', 'tempLo': '最低温', 'precip': '降水量', 'pop': '降水概率', 'today': '今天',
+      'units': { 'km/h': 'km/h', 'm/s': 'm/s', 'hPa': 'hPa', 'mmHg': 'mm Hg', 'mm': 'mm', 'in': 'in' },
+      'cardinalDirections': ['北', '北-东北', '东北', '东-东北', '东', '东-东南', '东南', '南-东南', '南', '南-西南', '西南', '西-西南', '西', '西-西北', '西北', '北-西北', '北'],
+      aqiLevels: ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染'],
+      'clear-night': '晴夜', 'cloudy': '阴', 'fog': '雾', 'hail': '冰雹', 'lightning': '闪电', 'lightning-rainy': '闪电，下雨', 'partlycloudy': '多云', 'pouring': '暴雨', 'rainy': '雨', 'snowy': '雪', 'snowy-rainy': '雨夹雪', 'sunny': '晴', 'windy': '风', 'windy-variant': '风'
     }
   };
 
-
-  const cardinalDirectionsIcon = [
-    'arrow-down', 'arrow-bottom-left', 'arrow-left',
-    'arrow-top-left', 'arrow-up', 'arrow-top-right',
-    'arrow-right', 'arrow-bottom-right', 'arrow-down'
-  ];
-
-  const weatherIcons = {
-		"clear-night": "hass:weather-night",
-		cloudy: "hass:weather-cloudy",
-		exceptional: "hass:alert-circle-outline",
-		fog: "hass:weather-fog",
-		hail: "hass:weather-hail",
-		lightning: "hass:weather-lightning",
-		"lightning-rainy": "hass:weather-lightning-rainy",
-		partlycloudy: "hass:weather-partly-cloudy",
-		pouring: "hass:weather-pouring",
-		rainy: "hass:weather-rainy",
-		snowy: "hass:weather-snowy",
-		"snowy-rainy": "hass:weather-snowy-rainy",
-		sunny: "hass:weather-sunny",
-		windy: "hass:weather-windy",
-		"windy-variant": "hass:weather-windy-variant"
-  };
-
-  const weatherIconsDay = {
-    'clear': 'day',
-	'clear-night': 'night',
-	'cloudy': 'cloudy',
-	'fog': 'cloudy',
-	'hail': 'rainy-7',
-	'lightning': 'thunder',
-	'lightning-rainy': 'thunder',
-	'partlycloudy': 'cloudy-day-3',
-	'pouring': 'rainy-6',
-	'rainy': 'rainy-5',
-	'snowy': 'snowy-6',
-	'snowy-rainy': 'rainy-7',
-	'sunny': 'day',
-	'windy': 'cloudy',
-	'windy-variant': 'cloudy-day-3',
-	exceptional: '!!'
-  };
-
-  const weatherIconsNight = {
-    ...weatherIconsDay,
-    'clear': 'night',
-	'sunny': 'night',
-	'partlycloudy': 'cloudy-night-3',
-	'windy-variant': 'cloudy-night-3'
-  };
-
-  /**
-   * @license
-   * Copyright 2019 Google LLC
-   * SPDX-License-Identifier: BSD-3-Clause
-   */
-  const t$1=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,e$2=Symbol(),n$3=new Map;class s$3{constructor(t,n){if(this._$cssResult$=!0,n!==e$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t;}get styleSheet(){let e=n$3.get(this.cssText);return t$1&&void 0===e&&(n$3.set(this.cssText,e=new CSSStyleSheet),e.replaceSync(this.cssText)),e}toString(){return this.cssText}}const o$3=t=>new s$3("string"==typeof t?t:t+"",e$2),i$1=(e,n)=>{t$1?e.adoptedStyleSheets=n.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):n.forEach((t=>{const n=document.createElement("style"),s=window.litNonce;void 0!==s&&n.setAttribute("nonce",s),n.textContent=t.cssText,e.appendChild(n);}));},S$1=t$1?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const n of t.cssRules)e+=n.cssText;return o$3(e)})(t):t;
-
-  /**
-   * @license
-   * Copyright 2017 Google LLC
-   * SPDX-License-Identifier: BSD-3-Clause
-   */var s$2;const e$1=window.reactiveElementPolyfillSupport,r$1={toAttribute(t,i){switch(i){case Boolean:t=t?"":null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},h$1=(t,i)=>i!==t&&(i==i||t==t),o$2={attribute:!0,type:String,converter:r$1,reflect:!1,hasChanged:h$1};class n$2 extends HTMLElement{constructor(){super(),this._$Et=new Map,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Ei=null,this.o();}static addInitializer(t){var i;null!==(i=this.l)&&void 0!==i||(this.l=[]),this.l.push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this._$Eh(s,i);void 0!==e&&(this._$Eu.set(e,s),t.push(e));})),t}static createProperty(t,i=o$2){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const r=this[t];this[i]=e,this.requestUpdate(t,r,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||o$2}static finalize(){if(this.hasOwnProperty("finalized"))return !1;this.finalized=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),this.elementProperties=new Map(t.elementProperties),this._$Eu=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(S$1(i));}else void 0!==i&&s.push(S$1(i));return s}static _$Eh(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}o(){var t;this._$Ev=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$Ep(),this.requestUpdate(),null===(t=this.constructor.l)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this._$Em)&&void 0!==i?i:this._$Em=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this._$Em)||void 0===i||i.splice(this._$Em.indexOf(t)>>>0,1);}_$Ep(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this._$Et.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return i$1(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)}));}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)}));}attributeChangedCallback(t,i,s){this._$AK(t,s);}_$Eg(t,i,s=o$2){var e,h;const n=this.constructor._$Eh(t,s);if(void 0!==n&&!0===s.reflect){const o=(null!==(h=null===(e=s.converter)||void 0===e?void 0:e.toAttribute)&&void 0!==h?h:r$1.toAttribute)(i,s.type);this._$Ei=t,null==o?this.removeAttribute(n):this.setAttribute(n,o),this._$Ei=null;}}_$AK(t,i){var s,e,h;const o=this.constructor,n=o._$Eu.get(t);if(void 0!==n&&this._$Ei!==n){const t=o.getPropertyOptions(n),l=t.converter,a=null!==(h=null!==(e=null===(s=l)||void 0===s?void 0:s.fromAttribute)&&void 0!==e?e:"function"==typeof l?l:null)&&void 0!==h?h:r$1.fromAttribute;this._$Ei=n,this[n]=a(i,t.type),this._$Ei=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||h$1)(this[t],i)?(this._$AL.has(t)||this._$AL.set(t,i),!0===s.reflect&&this._$Ei!==t&&(void 0===this._$ES&&(this._$ES=new Map),this._$ES.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this._$Ev=this._$EC());}async _$EC(){this.isUpdatePending=!0;try{await this._$Ev;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this._$Et&&(this._$Et.forEach(((t,i)=>this[i]=t)),this._$Et=void 0);let i=!1;const s=this._$AL;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this._$EU();}catch(t){throw i=!1,this._$EU(),t}i&&this._$AE(s);}willUpdate(t){}_$AE(t){var i;null===(i=this._$Em)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}_$EU(){this._$AL=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$Ev}shouldUpdate(t){return !0}update(t){void 0!==this._$ES&&(this._$ES.forEach(((t,i)=>this._$Eg(i,this[i],t))),this._$ES=void 0),this._$EU();}updated(t){}firstUpdated(t){}}n$2.finalized=!0,n$2.elementProperties=new Map,n$2.elementStyles=[],n$2.shadowRootOptions={mode:"open"},null==e$1||e$1({ReactiveElement:n$2}),(null!==(s$2=globalThis.reactiveElementVersions)&&void 0!==s$2?s$2:globalThis.reactiveElementVersions=[]).push("1.0.1");
-
-  /**
-   * @license
-   * Copyright 2017 Google LLC
-   * SPDX-License-Identifier: BSD-3-Clause
-   */
-  var t;const i=globalThis.trustedTypes,s$1=i?i.createPolicy("lit-html",{createHTML:t=>t}):void 0,e=`lit$${(Math.random()+"").slice(9)}$`,o$1="?"+e,n$1=`<${o$1}>`,l$1=document,h=(t="")=>l$1.createComment(t),r=t=>null===t||"object"!=typeof t&&"function"!=typeof t,d=Array.isArray,u=t=>{var i;return d(t)||"function"==typeof(null===(i=t)||void 0===i?void 0:i[Symbol.iterator])},c=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,v=/-->/g,a=/>/g,f=/>|[ 	\n\r](?:([^\s"'>=/]+)([ 	\n\r]*=[ 	\n\r]*(?:[^ 	\n\r"'`<>=]|("|')|))|$)/g,_=/'/g,m=/"/g,g=/^(?:script|style|textarea)$/i,$=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),p=$(1),b=Symbol.for("lit-noChange"),T=Symbol.for("lit-nothing"),x=new WeakMap,w=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new N(i.insertBefore(h(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l},A=l$1.createTreeWalker(l$1,129,null,!1),C=(t,i)=>{const o=t.length-1,l=[];let h,r=2===i?"<svg>":"",d=c;for(let i=0;i<o;i++){const s=t[i];let o,u,$=-1,p=0;for(;p<s.length&&(d.lastIndex=p,u=d.exec(s),null!==u);)p=d.lastIndex,d===c?"!--"===u[1]?d=v:void 0!==u[1]?d=a:void 0!==u[2]?(g.test(u[2])&&(h=RegExp("</"+u[2],"g")),d=f):void 0!==u[3]&&(d=f):d===f?">"===u[0]?(d=null!=h?h:c,$=-1):void 0===u[1]?$=-2:($=d.lastIndex-u[2].length,o=u[1],d=void 0===u[3]?f:'"'===u[3]?m:_):d===m||d===_?d=f:d===v||d===a?d=c:(d=f,h=void 0);const y=d===f&&t[i+1].startsWith("/>")?" ":"";r+=d===c?s+n$1:$>=0?(l.push(o),s.slice(0,$)+"$lit$"+s.slice($)+e+y):s+e+(-2===$?(l.push(void 0),i):y);}const u=r+(t[o]||"<?>")+(2===i?"</svg>":"");return [void 0!==s$1?s$1.createHTML(u):u,l]};class P{constructor({strings:t,_$litType$:s},n){let l;this.parts=[];let r=0,d=0;const u=t.length-1,c=this.parts,[v,a]=C(t,s);if(this.el=P.createElement(v,n),A.currentNode=this.el.content,2===s){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(l=A.nextNode())&&c.length<u;){if(1===l.nodeType){if(l.hasAttributes()){const t=[];for(const i of l.getAttributeNames())if(i.endsWith("$lit$")||i.startsWith(e)){const s=a[d++];if(t.push(i),void 0!==s){const t=l.getAttribute(s.toLowerCase()+"$lit$").split(e),i=/([.?@])?(.*)/.exec(s);c.push({type:1,index:r,name:i[2],strings:t,ctor:"."===i[1]?M:"?"===i[1]?k:"@"===i[1]?H:S});}else c.push({type:6,index:r});}for(const i of t)l.removeAttribute(i);}if(g.test(l.tagName)){const t=l.textContent.split(e),s=t.length-1;if(s>0){l.textContent=i?i.emptyScript:"";for(let i=0;i<s;i++)l.append(t[i],h()),A.nextNode(),c.push({type:2,index:++r});l.append(t[s],h());}}}else if(8===l.nodeType)if(l.data===o$1)c.push({type:2,index:r});else {let t=-1;for(;-1!==(t=l.data.indexOf(e,t+1));)c.push({type:7,index:r}),t+=e.length-1;}r++;}}static createElement(t,i){const s=l$1.createElement("template");return s.innerHTML=t,s}}function V(t,i,s=t,e){var o,n,l,h;if(i===b)return i;let d=void 0!==e?null===(o=s._$Cl)||void 0===o?void 0:o[e]:s._$Cu;const u=r(i)?void 0:i._$litDirective$;return (null==d?void 0:d.constructor)!==u&&(null===(n=null==d?void 0:d._$AO)||void 0===n||n.call(d,!1),void 0===u?d=void 0:(d=new u(t),d._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Cl)&&void 0!==l?l:h._$Cl=[])[e]=d:s._$Cu=d),void 0!==d&&(i=V(t,d._$AS(t,i.values),d,e)),i}class E{constructor(t,i){this.v=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}p(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:l$1).importNode(s,!0);A.currentNode=o;let n=A.nextNode(),h=0,r=0,d=e[0];for(;void 0!==d;){if(h===d.index){let i;2===d.type?i=new N(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new I(n,this,t)),this.v.push(i),d=e[++r];}h!==(null==d?void 0:d.index)&&(n=A.nextNode(),h++);}return o}m(t){let i=0;for(const s of this.v)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class N{constructor(t,i,s,e){var o;this.type=2,this._$AH=T,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cg=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cg}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=V(this,t,i),r(t)?t===T||null==t||""===t?(this._$AH!==T&&this._$AR(),this._$AH=T):t!==this._$AH&&t!==b&&this.$(t):void 0!==t._$litType$?this.T(t):void 0!==t.nodeType?this.S(t):u(t)?this.M(t):this.$(t);}A(t,i=this._$AB){return this._$AA.parentNode.insertBefore(t,i)}S(t){this._$AH!==t&&(this._$AR(),this._$AH=this.A(t));}$(t){this._$AH!==T&&r(this._$AH)?this._$AA.nextSibling.data=t:this.S(l$1.createTextNode(t)),this._$AH=t;}T(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=P.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.m(s);else {const t=new E(o,this),i=t.p(this.options);t.m(s),this.S(i),this._$AH=t;}}_$AC(t){let i=x.get(t.strings);return void 0===i&&x.set(t.strings,i=new P(t)),i}M(t){d(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new N(this.A(h()),this.A(h()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cg=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class S{constructor(t,i,s,e,o){this.type=1,this._$AH=T,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=T;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=V(this,t,i,0),n=!r(t)||t!==this._$AH&&t!==b,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=V(this,e[s+l],i,l),h===b&&(h=this._$AH[l]),n||(n=!r(h)||h!==this._$AH[l]),h===T?t=T:t!==T&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.k(t);}k(t){t===T?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class M extends S{constructor(){super(...arguments),this.type=3;}k(t){this.element[this.name]=t===T?void 0:t;}}class k extends S{constructor(){super(...arguments),this.type=4;}k(t){t&&t!==T?this.element.setAttribute(this.name,""):this.element.removeAttribute(this.name);}}class H extends S{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=V(this,t,i,0))&&void 0!==s?s:T)===b)return;const e=this._$AH,o=t===T&&e!==T||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==T&&(e===T||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class I{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){V(this,t);}}const R=window.litHtmlPolyfillSupport;null==R||R(P,N),(null!==(t=globalThis.litHtmlVersions)&&void 0!==t?t:globalThis.litHtmlVersions=[]).push("2.0.1");
-
-  /**
-   * @license
-   * Copyright 2017 Google LLC
-   * SPDX-License-Identifier: BSD-3-Clause
-   */var l,o;class s extends n$2{constructor(){super(...arguments),this.renderOptions={host:this},this._$Dt=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Dt=w(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Dt)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Dt)||void 0===t||t.setConnected(!1);}render(){return b}}s.finalized=!0,s._$litElement$=!0,null===(l=globalThis.litElementHydrateSupport)||void 0===l||l.call(globalThis,{LitElement:s});const n=globalThis.litElementPolyfillSupport;null==n||n({LitElement:s});(null!==(o=globalThis.litElementVersions)&&void 0!==o?o:globalThis.litElementVersions=[]).push("3.0.1");
+  const cardinalDirectionsIcon = ['arrow-down', 'arrow-bottom-left', 'arrow-left', 'arrow-top-left', 'arrow-up', 'arrow-top-right', 'arrow-right', 'arrow-bottom-right', 'arrow-down'];
 
   /*!
    * Chart.js v3.5.1
@@ -14693,26 +14461,31 @@
 
   Chart.register(...registerables, plugin);
 
+  const t$1=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,e$2=Symbol(),n$3=new Map;class s$3{constructor(t,n){if(this._$cssResult$=!0,n!==e$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t;}get styleSheet(){let e=n$3.get(this.cssText);return t$1&&void 0===e&&(n$3.set(this.cssText,e=new CSSStyleSheet),e.replaceSync(this.cssText)),e}toString(){return this.cssText}}const o$3=t=>new s$3("string"==typeof t?t:t+"",e$2),i$1=(e,n)=>{t$1?e.adoptedStyleSheets=n.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):n.forEach((t=>{const n=document.createElement("style"),s=window.litNonce;void 0!==s&&n.setAttribute("nonce",s),n.textContent=t.cssText,e.appendChild(n);}));},S$1=t$1?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const n of t.cssRules)e+=n.cssText;return o$3(e)})(t):t;
+  var s$2;const e$1=window.reactiveElementPolyfillSupport,r$1={toAttribute(t,i){switch(i){case Boolean:t=t?"":null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},h$1=(t,i)=>i!==t&&(i==i||t==t),o$2={attribute:!0,type:String,converter:r$1,reflect:!1,hasChanged:h$1};class n$2 extends HTMLElement{constructor(){super(),this._$Et=new Map,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Ei=null,this.o();}static addInitializer(t){var i;null!==(i=this.l)&&void 0!==i||(this.l=[]),this.l.push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this._$Eh(s,i);void 0!==e&&(this._$Eu.set(e,s),t.push(e));})),t}static createProperty(t,i=o$2){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const r=this[t];this[i]=e,this.requestUpdate(t,r,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||o$2}static finalize(){if(this.hasOwnProperty("finalized"))return !1;this.finalized=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),this.elementProperties=new Map(t.elementProperties),this._$Eu=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(S$1(i));}else void 0!==i&&s.push(S$1(i));return s}static _$Eh(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}o(){var t;this._$Ev=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$Ep(),this.requestUpdate(),null===(t=this.constructor.l)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this._$Em)&&void 0!==i?i:this._$Em=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this._$Em)||void 0===i||i.splice(this._$Em.indexOf(t)>>>0,1);}_$Ep(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this._$Et.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return i$1(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)}));}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)}));}attributeChangedCallback(t,i,s){this._$AK(t,s);}_$Eg(t,i,s=o$2){var e,h;const n=this.constructor._$Eh(t,s);if(void 0!==n&&!0===s.reflect){const o=(null!==(h=null===(e=s.converter)||void 0===e?void 0:e.toAttribute)&&void 0!==h?h:r$1.toAttribute)(i,s.type);this._$Ei=t,null==o?this.removeAttribute(n):this.setAttribute(n,o),this._$Ei=null;}}_$AK(t,i){var s,e,h;const o=this.constructor,n=o._$Eu.get(t);if(void 0!==n&&this._$Ei!==n){const t=o.getPropertyOptions(n),l=t.converter,a=null!==(h=null!==(e=null===(s=l)||void 0===s?void 0:s.fromAttribute)&&void 0!==e?e:"function"==typeof l?l:null)&&void 0!==h?h:r$1.fromAttribute;this._$Ei=n,this[n]=a(i,t.type),this._$Ei=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||h$1)(this[t],i)?(this._$AL.has(t)||this._$AL.set(t,i),!0===s.reflect&&this._$Ei!==t&&(void 0===this._$ES&&(this._$ES=new Map),this._$ES.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this._$Ev=this._$EC());}async _$EC(){this.isUpdatePending=!0;try{await this._$Ev;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this._$Et&&(this._$Et.forEach(((t,i)=>this[i]=t)),this._$Et=void 0);let i=!1;const s=this._$AL;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this._$Em)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this._$EU();}catch(t){throw i=!1,this._$EU(),t}i&&this._$AE(s);}willUpdate(t){}_$AE(t){var i;null===(i=this._$Em)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}_$EU(){this._$AL=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$Ev}shouldUpdate(t){return !0}update(t){void 0!==this._$ES&&(this._$ES.forEach(((t,i)=>this._$Eg(i,this[i],t))),this._$ES=void 0),this._$EU();}updated(t){}firstUpdated(t){}}n$2.finalized=!0,n$2.elementProperties=new Map,n$2.elementStyles=[],n$2.shadowRootOptions={mode:"open"},null==e$1||e$1({ReactiveElement:n$2}),(null!==(s$2=globalThis.reactiveElementVersions)&&void 0!==s$2?s$2:globalThis.reactiveElementVersions=[]).push("1.0.1");
+  var t;const i=globalThis.trustedTypes,s$1=i?i.createPolicy("lit-html",{createHTML:t=>t}):void 0,e=`lit$${(Math.random()+"").slice(9)}$`,o$1="?"+e,n$1=`<${o$1}>`,l$1=document,h=(t="")=>l$1.createComment(t),r=t=>null===t||"object"!=typeof t&&"function"!=typeof t,d=Array.isArray,u=t=>{var i;return d(t)||"function"==typeof(null===(i=t)||void 0===i?void 0:i[Symbol.iterator])},c=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,v=/-->/g,a=/>/g,f=/>|[ 	\n\r](?:([^\s"'>=/]+)([ 	\n\r]*=[ 	\n\r]*(?:[^ 	\n\r"'`<>=]|("|')|))|$)/g,_=/'/g,m=/"/g,g=/^(?:script|style|textarea)$/i,$=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),p=$(1),b=Symbol.for("lit-noChange"),T=Symbol.for("lit-nothing"),x=new WeakMap,w=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new N(i.insertBefore(h(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l},A=l$1.createTreeWalker(l$1,129,null,!1),C=(t,i)=>{const o=t.length-1,l=[];let h,r=2===i?"<svg>":"",d=c;for(let i=0;i<o;i++){const s=t[i];let o,u,$=-1,p=0;for(;p<s.length&&(d.lastIndex=p,u=d.exec(s),null!==u);)p=d.lastIndex,d===c?"!--"===u[1]?d=v:void 0!==u[1]?d=a:void 0!==u[2]?(g.test(u[2])&&(h=RegExp("</"+u[2],"g")),d=f):void 0!==u[3]&&(d=f):d===f?">"===u[0]?(d=null!=h?h:c,$=-1):void 0===u[1]?$=-2:($=d.lastIndex-u[2].length,o=u[1],d=void 0===u[3]?f:'"'===u[3]?m:_):d===m||d===_?d=f:d===v||d===a?d=c:(d=f,h=void 0);const y=d===f&&t[i+1].startsWith("/>") ? " " : "";r+=d===c?s+n$1:$>=0?(l.push(o),s.slice(0,$)+"$lit$"+s.slice($)+e+y):s+e+(-2===$?(l.push(void 0),i):y);}const u=r+(t[o]||"<?>")+(2===i?"</svg>":"");return [void 0 !== s$1 ? s$1.createHTML(u) : u,l]};class P{constructor({strings:t,_$litType$:s},n){let l;this.parts=[];let r=0,d=0;const u=t.length-1,c=this.parts,[v,a]=C(t,s);if(this.el=P.createElement(v,n),A.currentNode=this.el.content,2===s){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(l=A.nextNode())&&c.length<u;){if(1===l.nodeType){if(l.hasAttributes()){const t=[];for(const i of l.getAttributeNames())if(i.endsWith("$lit$")||i.startsWith(e)){const s=a[d++];if(t.push(i),void 0!==s){const t=l.getAttribute(s.toLowerCase()+"$lit$").split(e),i=/([.?@])?(.*)/.exec(s);c.push({type:1,index:r,name:i[2],strings:t,ctor:"."===i[1]?M:"?"===i[1]?k:"@"===i[1]?H:S});}else c.push({type:6,index:r});}for(const i of t)l.removeAttribute(i);}if(g.test(l.tagName)){const t=l.textContent.split(e),s=t.length-1;if(s>0){l.textContent=i?i.emptyScript:"";for(let i=0;i<s;i++)l.append(t[i],h()),A.nextNode(),c.push({type:2,index:++r});l.append(t[s],h());}}}else if(8===l.nodeType)if(l.data===o$1)c.push({type:2,index:r});else {let t=-1;for(;-1!==(t=l.data.indexOf(e,t+1));)c.push({type:7,index:r}),t+=e.length-1;}r++;}}static createElement(t,i){const s=l$1.createElement("template");return s.innerHTML=t,s}}function V(t,i,s=t,e){var o,n,l,h;if(i===b)return i;let d=void 0!==e?null===(o=s._$Cl)||void 0===o?void 0:o[e]:s._$Cu;const u=r(i)?void 0:i._$litDirective$;return (null==d?void 0:d.constructor)!==u&&(null===(n=null==d?void 0:d._$AO)||void 0===n||n.call(d,!1),void 0===u?d=void 0:(d=new u(t),d._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Cl)&&void 0!==l?l:h._$Cl=[])[e]=d:s._$Cu=d),void 0!==d&&(i=V(t,d._$AS(t,i.values),d,e)),i}class E{constructor(t,i){this.v=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}p(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:l$1).importNode(s,!0);A.currentNode=o;let n=A.nextNode(),h=0,r=0,d=e[0];for(;void 0!==d;){if(h===d.index){let i;2===d.type?i=new N(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new I(n,this,t)),this.v.push(i),d=e[++r];}h!==(null==d?void 0:d.index)&&(n=A.nextNode(),h++);}return o}m(t){let i=0;for(const s of this.v)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class N{constructor(t,i,s,e){var o;this.type=2,this._$AH=T,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cg=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cg}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=V(this,t,i),r(t)?t===T||null==t||""===t?(this._$AH!==T&&this._$AR(),this._$AH=T):t!==this._$AH&&t!==b&&this.$(t):void 0!==t._$litType$?this.T(t):void 0!==t.nodeType?this.S(t):u(t)?this.M(t):this.$(t);}A(t,i=this._$AB){return this._$AA.parentNode.insertBefore(t,i)}S(t){this._$AH!==t&&(this._$AR(),this._$AH=this.A(t));}$(t){this._$AH!==T&&r(this._$AH)?this._$AA.nextSibling.data=t:this.S(l$1.createTextNode(t)),this._$AH=t;}T(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=P.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.m(s);else {const t=new E(o,this),i=t.p(this.options);t.m(s),this.S(i),this._$AH=t;}}_$AC(t){let i=x.get(t.strings);return void 0===i&&x.set(t.strings,i=new P(t)),i}M(t){d(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new N(this.A(h()),this.A(h()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cg=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class S{constructor(t,i,s,e,o){this.type=1,this._$AH=T,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=T;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=V(this,t,i,0),n=!r(t)||t!==this._$AH&&t!==b,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=V(this, e[s+l],i,l),h===b&&(h=this._$AH[l]),n||(n=!r(h)||h!==this._$AH[l]),h===T?t=T:t!==T&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.k(t);}k(t){t===T?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class M extends S{constructor(){super(...arguments),this.type=3;}k(t){this.element[this.name]=t===T?void 0:t;}}class k extends S{constructor(){super(...arguments),this.type=4;}k(t){t&&t!==T?this.element.setAttribute(this.name,""):this.element.removeAttribute(this.name);}}class H extends S{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=V(this,t,i,0))&&void 0!==s?s:T)===b)return;const e=this._$AH,o=t===T&&e!==T||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==T&&(e===T||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class I{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){V(this,t);}}const R=window.litHtmlPolyfillSupport;null==R||R(P,N),(null!==(t=globalThis.litHtmlVersions)&&void 0!==t?t:globalThis.litHtmlVersions=[]).push("2.0.1");var l,o;class s extends n$2{constructor(){super(...arguments),this.renderOptions={host:this},this._$Dt=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Dt=w(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Dt)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Dt)||void 0===t||t.setConnected(!1);}render(){return b}}s.finalized=!0,s._$litElement$=!0,null===(l=globalThis.litElementHydrateSupport)||void 0===l||l.call(globalThis,{LitElement:s});const n=globalThis.litElementPolyfillSupport;null==n||n({LitElement:s});(null!==(o=globalThis.litElementVersions)&&void 0!==o?o:globalThis.litElementVersions=[]).push("3.0.1");
+
+  /* --- 3. 卡片主类 --- */
   class WeatherChartCard extends s {
 
     static getStubConfig() {
       return {
-		"entity": "weather.tian_qi",
-		"title": '',
-		"name": '',
-		"show_attributes": true,
-		"show_hourly_forecast": true,
-		"show_daily_forecast": true,
-		"show_daily_chart": true,
-		"show_daily_date": true,
-		"show_condition_text": true,
-		"show_keypoint": true,			
-		"show_warning": true,
-		"show_warningtext": false,
-		"show_night": false,
-		"show_wind": false,			
-		"show_daily_temperature": false,
-		"show_thick_border": false
+        "entity": "weather.tian_qi",
+        "title": '',
+        "name": '',
+        "show_attributes": true,
+        "show_hourly_forecast": true,
+        "show_daily_forecast": true,
+        "show_daily_chart": true,
+        "show_daily_date": true,
+        "show_condition_text": true,
+        "show_keypoint": true,
+        "show_warning": true,
+        "show_warningtext": false,
+        "show_night": false,
+        "show_wind": false,
+        "show_daily_temperature": false,
+        "show_thick_border": false
       };
     }
 
@@ -14721,17 +14494,19 @@
         _hass: {},
         config: {},
         language: {},
-        sun: {type: Object},
-        weather: {type: Object},
-        temperature: {type: Object},
-        humidity: {type: Object},
-        pressure: {type: Object},
-        windSpeed: {type: Object},
-        windDirection: {type: Object},
-        forecastChart: {type: Object},
-		forecasthourlyChart: {type: Object},
-        forecastItems: {type: Number},
-        iconSize: {type: Number}
+        sun: { type: Object },
+        weather: { type: Object },
+        _forecast_daily: { type: Array },
+        _forecast_hourly: { type: Array },
+        temperature: { type: Object },
+        humidity: { type: Object },
+        pressure: { type: Object },
+        windSpeed: { type: Object },
+        windDirection: { type: Object },
+        forecastChart: { type: Object },
+        forecasthourlyChart: { type: Object },
+        forecastItems: { type: Number },
+        iconSize: { type: Number }
       };
     }
 
@@ -14739,26 +14514,58 @@
       this.config = config;
       if (!config.entity) {
         throw new Error('Please, define entity in the card config');
-      }  }
+      }
+    }
 
     set hass(hass) {
       this._hass = hass;
       this.language = hass.selectedLanguage || hass.language;
-      this.sun = 'sun.sun' in hass.states ? hass.states['sun.sun'] : null;
-      this.weather = this.config.entity in hass.states
-        ? hass.states[this.config.entity] : null;
-      if (this.weather) {
-        this.temperature = this.weather.attributes.temperature;
-        this.humidity = this.weather.attributes.humidity;
-        this.pressure = this.weather.attributes.pressure;
-        this.windSpeed = this.weather.attributes.wind_speed;
-        this.windDirection = this.weather.attributes.wind_bearing;
+      const newWeather = this.config.entity in hass.states ? hass.states[this.config.entity] : null;
+
+      if (newWeather && (this.weather !== newWeather)) {
+        this.weather = newWeather;
+        this.temperature = newWeather.attributes.temperature;
+        this.humidity = newWeather.attributes.humidity;
+        this.pressure = newWeather.attributes.pressure;
+        this.windSpeed = newWeather.attributes.wind_speed;
+        this.windDirection = newWeather.attributes.wind_bearing;
+        
+        // 调用数据获取
+        this._getForecasts();
       }
+
+      this.sun = 'sun.sun' in hass.states ? hass.states['sun.sun'] : null;
       this.iconSize = this.config.icons_size ? this.config.icons_size : 18;
-      this.unitSpeed = this.config.units && this.config.units.speed
-        ? this.config.units.speed : 'km/h';
-      this.unitPressure = this.config.units && this.config.units.pressure
-        ? this.config.units.pressure : 'hPa';
+      this.unitSpeed = this.config.units && this.config.units.speed ? this.config.units.speed : 'km/h';
+      this.unitPressure = this.config.units && this.config.units.pressure ? this.config.units.pressure : 'hPa';
+    }
+
+    async _getForecasts() {
+      if (!this._hass || !this.config.entity) return;
+      const entity_id = this.config.entity;
+
+      // 每日预报
+      this._hass.connection.subscribeMessage(
+        (msg) => {
+          this._forecast_daily = msg.forecast;
+          // 修复图表不显示的各种竞态条件：等待 DOM 更新
+          this.updateComplete.then(() => {
+             this.updateChart();
+          });
+        },
+        { type: "weather/subscribe_forecast", entity_id: entity_id, forecast_type: "daily" }
+      );
+
+      // 小时预报
+      this._hass.connection.subscribeMessage(
+        (msg) => {
+          this._forecast_hourly = msg.forecast;
+          this.updateComplete.then(() => {
+             this.updateCharthourly();
+          });
+        },
+        { type: "weather/subscribe_forecast", entity_id: entity_id, forecast_type: "hourly" }
+      );
     }
 
     constructor() {
@@ -14766,126 +14573,93 @@
     }
 
     ll(str) {
-      if (locale[this.language] === undefined) return locale.en[str];
+      if (locale[this.language] === undefined) return locale.en[str] || str;
       return locale[this.language][str];
     }
 
-    getCardSize() {
-      return 4;
+    getCardSize() { return 4; }
+    getUnit(unit) { return this._hass.config.unit_system[unit] || ''; }
+    _showValue(item) { return typeof item !== "undefined" && item !== null; }
+    roundNumber(number) { return Math.round(number); }
+    aqiLevel(aqi) { return 'aqi_level_' + parseInt(aqi / 50.0) + '_bg'; }
+
+    getSuggestion(type) {
+      if (!this.weather.attributes.suggestion) return "";
+      for (var i = 0; i < this.weather.attributes.suggestion.length; i++) {
+        if (this.weather.attributes.suggestion[i].title == type) {
+          return this.weather.attributes.suggestion[i].brf;
+        }
+      }
+      return "";
     }
 
-    getUnit(unit) {
-      return this._hass.config.unit_system[unit] || '';
-    }
-	
-	_showValue(item) {
-	  return typeof item !== "undefined" && item !== null;
-	}
-	
-	roundNumber(number) {
-	  var rounded = Math.round(number);
-	  return rounded;
-	}
-
-	aqiLevel(aqi) {
-	  return 'aqi_level_' + parseInt(aqi / 50.0) + '_bg';
-	}
-
-	getSuggestion(type) {
-	  for (var i = 0; i < this.weather.attributes.suggestion.length; i++) {
-		if (this.weather.attributes.suggestion[i].title == type) {
-		  return this.weather.attributes.suggestion[i].brf;
-		}
-	  }
-	}
-	
-	
-
-    getWeatherIcon(condition, sun) {
-      return weatherIcons[condition];
-    }
-	
-	getWeatherIconurl(condition, sun) {
-        return `/qweather-local/qweather-card/picicons/animated/${
-        sun == 'below_horizon'
-        ? weatherIconsNight[condition]
-        : weatherIconsDay[condition]}.svg`
-    }
-	
-	gethfIconurl(icon) {
-        return `/qweather-local/qweather-card/icons/${[icon]}.svg`
-    }
-
-    getWindDirIcon(deg) {
-      return cardinalDirectionsIcon[parseInt((deg + 22.5) / 45.0)];
-    }
-
-    getWindDir(deg) {
-      return this.ll('cardinalDirections')[parseInt((deg + 11.25) / 22.5)];
-    }
+    gethfIconurl(icon) { return `/qweather-local/qweather-card/icons/${[icon]}.svg`; }
+    getWindDirIcon(deg) { return cardinalDirectionsIcon[parseInt((deg + 22.5) / 45.0)]; }
+    getWindDir(deg) { return this.ll('cardinalDirections')[parseInt((deg + 11.25) / 22.5)]; }
 
     firstUpdated() {
       this.measureCard();
-      this.drawChart();
     }
 
     updated(changedProperties) {
       if (changedProperties.has('config')) {
-        this.drawChart();
-		this.drawCharthourly();
-      }    if (changedProperties.has('weather')) {
         this.updateChart();
-		this.updateCharthourly();
-      }  }
+        this.updateCharthourly();
+      }
+    }
 
     measureCard() {
       const card = this.shadowRoot.querySelector('ha-card');
-      if (!card) {
-        return;
-      }
+      if (!card) return;
       this.forecastItems = Math.round(card.offsetWidth / 20);
     }
 
-    drawChart({config, language, weather, forecastItems} = this) {
-      if (!weather || !weather.attributes || !weather.attributes.daily_forecast) {
-        return [];
+    updateChart() {
+       const canvas = this.renderRoot.querySelector('#forecastChart');
+       if (canvas && this._forecast_daily && this._forecast_daily.length > 0) {
+         this.drawChart();
+       }
+    }
+
+    updateCharthourly() {
+       const canvas = this.renderRoot.querySelector('#forecasthourlyChart');
+       if (canvas && this._forecast_hourly && this._forecast_hourly.length > 0) {
+         this.drawCharthourly();
+       }
+    }
+
+    drawChart() {
+      const config = this.config;
+      // 这里的 Chart 是从头部闭包中获取的，如果文件头部丢失则会报错
+      if (typeof Chart === 'undefined') {
+         console.error("Chart.js library not loaded/defined!"); 
+         return;
       }
+      
+      if (!this._forecast_daily || this._forecast_daily.length === 0) return [];
+      
+      const forecastItems = this.forecastItems || 7;
+      const forecast = this._forecast_daily.slice(0, forecastItems);
+      const language = this.language;
+
       if (this.forecastChart) {
         this.forecastChart.destroy();
       }
+
       var tempHiColor = config.temp1_color ? config.temp1_color : 'rgba(230, 100, 100, 1.0)';
       var tempLoColor = config.temp2_color ? config.temp2_color : 'rgba(68, 115, 158, 1.0)';
       var precipColor = config.precip_color ? config.precip_color : 'rgba(132, 209, 253, 1.0)';
       var tempUnit = this._hass.config.unit_system.temperature;
-      var lengthUnit = this._hass.config.unit_system.length;
-      var precipUnit = lengthUnit === 'km' ? this.ll('units')['mm'] : this.ll('units')['in'];
-      var forecast = weather.attributes.daily_forecast.slice(0, forecastItems);
-      if ((new Date(forecast[1].datetime) - new Date(forecast[0].datetime)) < 864e5)
-        var mode = 'hourly';
-      else
-        var mode = 'daily';
-      var i;
-      var dateTime = [];
-      var tempHigh = [];
-      var tempLow = [];
-      var precip = [];
-      for (i = 0; i < forecast.length; i++) {
-        var d = forecast[i];
-        dateTime.push(d.datetime);
-        tempHigh.push(d.native_temperature);
-        if (typeof d.native_temp_low !== 'undefined') {
-          tempLow.push(d.native_temp_low);
-        }
-        precip.push(d.native_precipitation);
-      }
+      var precipUnit = this._hass.config.unit_system.length === 'km' ? this.ll('units')['mm'] : this.ll('units')['in'];
+
+      const ctx = this.renderRoot.querySelector('#forecastChart').getContext('2d');
       var style = getComputedStyle(document.body);
       var backgroundColor = style.getPropertyValue('--card-background-color');
       var textColor = style.getPropertyValue('--primary-text-color');
       var dividerColor = style.getPropertyValue('--divider-color');
-	  if (config.show_thick_border == true){
-		  dividerColor = "#dedede";
-	  }
-      const ctx = this.renderRoot.querySelector('#forecastChart').getContext('2d');
+      if (config.show_thick_border == true){
+          dividerColor = "#dedede";
+      }
 
       Chart.defaults.color = textColor;
       Chart.defaults.scale.grid.color = dividerColor;
@@ -14898,11 +14672,11 @@
       this.forecastChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: dateTime,
+          labels: forecast.map(d => d.datetime),
           datasets: [{
             label: this.ll('tempHi'),
             type: 'line',
-            data: tempHigh,
+            data: forecast.map(d => d.temperature),
             yAxisID: 'TempAxis',
             borderColor: tempHiColor,
             backgroundColor: tempHiColor,
@@ -14910,7 +14684,7 @@
           {
             label: this.ll('tempLo'),
             type: 'line',
-            data: tempLow,
+            data: forecast.map(d => d.templow),
             yAxisID: 'TempAxis',
             borderColor: tempLoColor,
             backgroundColor: tempLoColor,
@@ -14918,22 +14692,15 @@
           {
             label: this.ll('precip'),
             type: 'bar',
-            data: precip,
+            data: forecast.map(d => d.precipitation || 0),
             yAxisID: 'PrecipAxis',
             borderColor: precipColor,
             backgroundColor: precipColor,
             barPercentage: 1.0,
             categoryPercentage: 1.0,
             datalabels: {
-              display: function(context) {
-                return context.dataset.data[context.dataIndex] > 0 ? 'auto' : false;
-              },
-              formatter: function(value, context) {
-                if (context.dataset.data[context.dataIndex] > 9) {
-                  return Math.round(context.dataset.data[context.dataIndex]) + ' ' + precipUnit;
-                }
-                return context.dataset.data[context.dataIndex].toFixed(1) + ' ' + precipUnit;
-              },
+              display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+              formatter: (val) => val.toFixed(1) + ' ' + precipUnit,
               align: 'top',
               anchor: 'start',
               offset: -8,
@@ -14942,79 +14709,54 @@
         },
         options: {
           maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          events: forecast.length > 0 ? ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'] : [],
           layout: {
-            padding: {
-              bottom: 10,
-            }
+            padding: { bottom: 24 } // 增加底部padding防止重叠
           },
           scales: {
             DateTimeAxis: {
               position: 'bottom',
+              display: true, // 开启轴显示以绘制网格
               grid: {
+                display: true, // 开启网格线（竖线）
                 drawBorder: false,
                 drawTicks: false,
-                zeroLineColor: dividerColor,
+                color: dividerColor, // 竖线颜色
               },
               ticks: {
+                display: false, // 隐藏文字刻度（日期）
+                autoSkip: false,     // <--- 【新增】强制显示所有竖线
+                maxTicksLimit: 100,  // <--- 【新增】提高上限，确保40个点也能全画出来
                 maxRotation: 0,
-                padding: 0,
-                callback: function(value, index, values) {
-                  var datetime = this.getLabelForValue(value);				  
-                  var weekday = this._today(datetime, language);		
-                  var time = new Date(datetime).toLocaleTimeString(language,
-                    { hour12: false, hour: 'numeric', minute: 'numeric' });
-                  if (mode == 'hourly') {
-                    return time;
-                  }
-                  return '';
-                }
+                padding: 0
               }
             },
             TempAxis: {
               position: 'left',
+              display: false, // 隐藏左侧气温轴
               beginAtZero: false,
-              suggestedMin: Math.min(...tempHigh, ...tempLow) - 5,
-              suggestedMax: Math.max(...tempHigh, ...tempLow) + 3,
-              grid: {
-                display: false,
-                drawBorder: false,
-                drawTicks: false,
-              },
-              ticks: {
-                display: false,
-              }
+              suggestedMin: Math.min(...forecast.map(d => d.templow)) - 5,
+              suggestedMax: Math.max(...forecast.map(d => d.temperature)) + 3,
+              grid: { display: false }
             },
             PrecipAxis: {
               position: 'right',
-              suggestedMax: 50,
-              grid: {
-                display: false,
-                drawBorder: false,
-                drawTicks: false,
-              },
-              ticks: {
-                display: false,
-              }
+              display: false, // 隐藏右侧降水轴
+              suggestedMax: 20,
+              grid: { display: false }
             }
           },
           plugins: {
-            legend: {
-              display: false,
-            },
+            legend: { display: false },
             datalabels: {
               backgroundColor: backgroundColor,
               borderColor: context => context.dataset.backgroundColor,
               borderRadius: 8,
               borderWidth: 1.5,
               padding: 4,
-              font: {
-                size: 10,
-                weight: 'bold',
-                lineHeight: 0.6,
-              },
-              formatter: function(value, context) {
-                return context.dataset.data[context.dataIndex] + tempUnit;
-              }
+              font: { size: 10, weight: 'bold', lineHeight: 0.6 },
+              formatter: (val, ctx) => ctx.dataset.type === 'line' ? val + tempUnit : ""
             },
             tooltip: {
               caretSize: 0,
@@ -15026,8 +14768,6 @@
                     month: 'short',
                     day: 'numeric',
                     weekday: 'short',
-                    hour: 'numeric',
-                    minute: 'numeric',
                   });
                 },
                 label: function(context) {
@@ -15044,483 +14784,217 @@
         }
       });
     }
-	
-	drawCharthourly({config, language, weather, forecastItems} = this) {
-      if (!weather || !weather.attributes || !weather.attributes.hourly_forecast) {
-        return [];
-      }
+    
+    drawCharthourly() {
+      const config = this.config;
+      if (typeof Chart === 'undefined') return;
+      if (!this._forecast_hourly || this._forecast_hourly.length === 0) return;
+      
+      const forecastItems = this.forecastItems || 24;
+      const forecast = this._forecast_hourly.slice(0, forecastItems);
+      const tempUnit = this._hass.config.unit_system.temperature;
+
       if (this.forecasthourlyChart) {
         this.forecasthourlyChart.destroy();
       }
+
       var tempHiColor = config.temp1_color ? config.temp1_color : 'rgba(230, 100, 100, 1.0)';
-      var tempLoColor = config.temp2_color ? config.temp2_color : 'rgba(68, 115, 158, 1.0)';
-	  var precipColor = config.precip_color ? config.precip_color : 'rgba(132, 209, 253, 1.0)';  
+      var precipColor = config.precip_color ? config.precip_color : 'rgba(132, 209, 253, 1.0)';  
       var popColor = config.pop_color ? config.pop_color : 'rgba(230, 230, 230, 0.5)';
-      var tempUnit = this._hass.config.unit_system.temperature;
-      var lengthUnit = this._hass.config.unit_system.length;
-	  var precipUnit = lengthUnit === 'km' ? this.ll('units')['mm'] : this.ll('units')['in'];
-      var popUnit = '%';
-      var forecasthourly = weather.attributes.hourly_forecast.slice(0, forecastItems);
-      if ((new Date(forecasthourly[1].datetime) - new Date(forecasthourly[0].datetime)) < 864e5)
-        var mode = 'hourly';
-      else
-        var mode = 'daily';
-      var i;
-      var dateTime = [];
-      var tempHigh = [];
-	  var tempLow = [];
-	  var precip = [];
-      var pop = [];
-      for (i = 0; i < forecasthourly.length; i++) {
-        var d = forecasthourly[i];
-        dateTime.push(d.datetime);
-        tempHigh.push(d.temperature);
-        if (typeof d.templow !== 'undefined') {
-          tempLow.push(d.templow);
-        }
-		precip.push(d.precipitation);
-        pop.push(d.probable_precipitation);
-      }
+      
       var style = getComputedStyle(document.body);
       var backgroundColor = style.getPropertyValue('--card-background-color');
-      var textColor = style.getPropertyValue('--primary-text-color');
       var dividerColor = style.getPropertyValue('--divider-color');
-	  if (config.show_thick_border == true){
-		  dividerColor = "#dedede";
-	  }
-      const ctx = this.renderRoot.querySelector('#forecasthourlyChart').getContext('2d');
+      if (config.show_thick_border == true){
+          dividerColor = "#dedede";
+      }
 
-      Chart.defaults.color = textColor;
-      Chart.defaults.scale.grid.color = dividerColor;
-      Chart.defaults.elements.line.fill = false;
-      Chart.defaults.elements.line.tension = 0.3;
-      Chart.defaults.elements.line.borderWidth = 1.5;
-      Chart.defaults.elements.point.radius = 2;
-      Chart.defaults.elements.point.hitRadius = 10;
+      const ctx = this.renderRoot.querySelector('#forecasthourlyChart').getContext('2d');
 
       this.forecasthourlyChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: dateTime,
+          labels: forecast.map(d => d.datetime),
           datasets: [{
             label: this.ll('tempHi'),
             type: 'line',
-            data: tempHigh,
+            data: forecast.map(d => d.temperature),
             yAxisID: 'TempAxis',
             borderColor: tempHiColor,
             backgroundColor: tempHiColor,
           },
           {
-            label: this.ll('tempLo'),
-            type: 'line',
-            data: tempLow,
-            yAxisID: 'TempAxis',
-            borderColor: tempLoColor,
-            backgroundColor: tempLoColor,
-          },
-          {
             label: this.ll('precip'),
             type: 'bar',
-            data: precip,
+            data: forecast.map(d => d.precipitation || 0),
             yAxisID: 'PrecipAxis',
             borderColor: precipColor,
             backgroundColor: precipColor,
             barPercentage: 1.0,
             categoryPercentage: 1.0,
-            datalabels: {
-              display: function(context) {
-                return context.dataset.data[context.dataIndex] > 0 ? 'auto' : false;
-              },
-              formatter: function(value, context) {
-				if (context.dataset.data[context.dataIndex] > 9) {
-                  return Math.round(context.dataset.data[context.dataIndex]); // + ' ' + precipUnit;
-                }
-                return Number(context.dataset.data[context.dataIndex]).toFixed(1); // + ' ' + precipUnit;
-              },
-              align: 'top',
-              anchor: 'start',
-              offset: -8,
-            }
+            datalabels: { display: false } 
           },
           {
             label: this.ll('pop'),
             type: 'bar',
-            data: pop,
+            data: forecast.map(d => d.precipitation_probability || 0),
             yAxisID: 'PopAxis',
             borderColor: popColor,
             backgroundColor: popColor,
-			barPercentage: 1.0,
+            barPercentage: 1.0,
             categoryPercentage: 1.0,
-            datalabels: {
-              display: function(context) {
-                return false;
-              },
-              formatter: function(value, context) {
-				if (context.dataset.data[context.dataIndex] > 9) {
-                  return Math.round(context.dataset.data[context.dataIndex]); // + ' ' + popUnit;
-                }
-                return Number(context.dataset.data[context.dataIndex]).toFixed(1); // + ' ' + popUnit;
-              },
-              align: 'top',
-              anchor: 'start',
-              offset: -8,
-            }
+            datalabels: { display: false }
           }]
         },
         options: {
           maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          events: forecast.length > 0 ? ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'] : [],
           layout: {
-            padding: {
-              bottom: 10,
-            }
+            padding: { bottom: 10 }
           },
           scales: {
             DateTimeAxis: {
               position: 'top',
+              display: true, // 开启轴
               grid: {
+                display: true, // 开启网格竖线
                 drawBorder: false,
                 drawTicks: false,
-                zeroLineColor: dividerColor,
+                color: dividerColor, 
               },
               ticks: {
                 maxRotation: 0,
                 padding: 8,
-                callback: function(value, index, values) {
-                  var datetime = this.getLabelForValue(value);				  
-                  var weekday = this._today(datetime, language);		
-                  var time = new Date(datetime).toLocaleTimeString(language,
-                    { hour12: false, hour: 'numeric', minute: 'numeric' });
-                  if (mode == 'hourly') {
-                    return time;
-                  }
-                  return weekday;
+                callback: (v, i) => {
+                   if(forecast[i]) return new Date(forecast[i].datetime).getHours() + ":00";
+                   return "";
                 }
               }
             },
-            TempAxis: {
-              position: 'left',
-              beginAtZero: false,
-              suggestedMin: Math.min(...tempHigh, ...tempLow) - 2,
-              suggestedMax: Math.max(...tempHigh, ...tempLow) + 3,
-              grid: {
-                display: false,
-                drawBorder: false,
-                drawTicks: false,
-              },
-              ticks: {
-                display: false,
-              }
+            TempAxis: { 
+                position: 'left', 
+                display: false, 
+                suggestedMin: Math.min(...forecast.map(d=>d.temperature)) - 2,
+                suggestedMax: Math.max(...forecast.map(d=>d.temperature)) + 5,
+                grid: { display: false } 
             },
-            PrecipAxis: {
-              position: 'left',
-              suggestedMax: 20,
-              grid: {
-                display: false,
-                drawBorder: false,
-                drawTicks: false,
-              },
-              ticks: {
-                display: false,
-              }
-            },
-            PopAxis: {
-              position: 'right',
-              suggestedMax: 100,
-              grid: {
-                display: false,
-                drawBorder: false,
-                drawTicks: false,
-              },
-              ticks: {
-                display: false,
-              }
-            }
+            PrecipAxis: { display: false, position: 'right', suggestedMax: 20 },
+            PopAxis: { display: false, position: 'right', suggestedMax: 100 }
           },
           plugins: {
-            legend: {
-              display: false,
-            },
+            legend: { display: false },
             datalabels: {
               backgroundColor: backgroundColor,
               borderColor: context => context.dataset.backgroundColor,
-              borderRadius: 8,
-              borderWidth: 1.5,
-              padding: 4,
-              font: {
-                size: 8,
-                weight: 'bold',
-                lineHeight: 0.6,
-              },
-              formatter: function(value, context) {
-				
-				if (context.datasetIndex == 2) {
-					if (Number(context.dataset.data[context.dataIndex]) < 10){
-						return Math.round(context.dataset.data[context.dataIndex]*10)/10
-					}
-                    return Math.round(context.dataset.data[context.dataIndex]);  // + precipUnit
-                  }
-				if (context.datasetIndex == 3) {
-                    return // context.dataset.data[context.dataIndex] + popUnit;
-                  }
-                return context.dataset.data[context.dataIndex]; // + tempUnit;
-              }
-            },
-            tooltip: {
-              caretSize: 0,
-              caretPadding: 15,
-              callbacks: {
-                title: function (TooltipItem) {
-                  var datetime = TooltipItem[0].label;
-                  return new Date(datetime).toLocaleDateString(language, {
-                    month: 'short',
-                    day: 'numeric',
-                    weekday: 'short',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                  });
-                },
-                label: function(context) {
-                  var label = context.dataset.label;
-                  var value = context.formattedValue;
-                  if (context.datasetIndex == 3) {
-                    return label + ': ' + value + ' ' + popUnit;
-                  }
-				  if (context.datasetIndex == 2) {
-                    return label + ': ' + value + ' ' + precipUnit;
-                  }
-                  return label + ': ' + value + ' ' + tempUnit;
-                }
-              }
+              borderRadius: 6,
+              borderWidth: 1.2,
+              padding: 2,
+              font: { size: 9, weight: 'bold' },
+              formatter: (val, ctx) => ctx.dataset.type === 'line' ? val + "°" : ""
             }
           }
         }
       });
     }
-	
 
-    updateChart({weather, forecastItems, forecastChart} = this) {
-      if (!weather || !weather.attributes || !weather.attributes.daily_forecast) {
-        return [];
-      }
-      var forecast = weather.attributes.daily_forecast.slice(0, forecastItems);
-      var i;
-      var dateTime = [];
-      var tempHigh = [];
-	  var tempLow = [];	  
-      var precip = [];
-      for (i = 0; i < forecast.length; i++) {
-        var d = forecast[i];
-        dateTime.push(d.datetime);
-        tempHigh.push(d.native_temperature);
-        if (typeof d.native_temp_low !== 'undefined') {
-          tempLow.push(d.native_temp_low);
-        }
-        precip.push(d.native_precipitation);
-      }
-      if (forecastChart) {
-        forecastChart.data.labels = dateTime;
-        forecastChart.data.datasets[0].data = tempHigh;
-		forecastChart.data.datasets[1].data = tempLow;
-		forecastChart.data.datasets[2].data = precip;
-        forecastChart.update();
-      }
+    _today(date, lang) {
+      let d = new Date(date), now = new Date();
+      if (d.getDate() === now.getDate()) return this.ll('today');
+      return d.toLocaleDateString(lang, { weekday: "short" });
     }
-	
-	updateCharthourly({weather, forecastItems, forecasthourlyChart} = this) {
-      if (!weather || !weather.attributes || !weather.attributes.hourly_forecast) {
-        return [];
-      }
-      var forecasthourly = weather.attributes.hourly_forecast.slice(0, forecastItems);
-	  //console.log(forecasthourly);
-      var i;
-      var dateTime = [];
-      var tempHigh = [];
-	  var tempLow = [];
-	  var precip = [];
-      var pop = [];
-      for (i = 0; i < forecasthourly.length; i++) {
-        var d = forecasthourly[i];
-        dateTime.push(d.datetime);
-        tempHigh.push(d.native_temperature);
-        if (typeof d.templow !== 'undefined') {
-          tempLow.push(d.native_temp_low);
-        }
-        precip.push(d.native_precipitation);
-        pop.push(d.probable_precipitation);
-      }
-      if (forecasthourlyChart) {
-        forecasthourlyChart.data.labels = dateTime;
-        forecasthourlyChart.data.datasets[0].data = tempHigh;
-		forecasthourlyChart.data.datasets[1].data = tempLow;
-		forecasthourlyChart.data.datasets[2].data = precip;
-        forecasthourlyChart.data.datasets[3].data = pop;
-        forecasthourlyChart.update();
-      }
-    }
-	
-	_today(date,lang){
-		let retext = new Date(date).toLocaleDateString(
-								lang,
-								{
-								  weekday: "short"
-								}
-							  )
-		let inDate = new Date(date)
-		let nowDate = new Date()
-
-		if(inDate.getDate() === nowDate.getDate()){
-		  retext =  this.ll('today',lang) 
-		}
-		return retext
-	}	
-	
 
     render({config, _hass, weather, forecastItems} = this) {
-      if (!config || !_hass) {
-        return p``;
-      }
-      if (!weather || !weather.attributes || !weather.attributes.daily_forecast) {
+      if (!config || !_hass) return p``;
+      if (!weather || !weather.attributes) {
         return p`
-        <style>
-          .card {
-            padding-top: ${config.title? '0px' : '16px'};
-            padding-right: 16px;
-            padding-bottom: 16px;
-            padding-left: 16px;
-          }
-        </style>
-        <ha-card header="${config.title}">
-          <div class="card">
-            Please, check your weather entity
-          </div>
-        </ha-card>
-      `;
+        <style>.card{padding:16px;}</style>
+        <ha-card header="${config.title}"><div class="card">Check weather entity</div></ha-card>`;
       }
-      const forecast = weather.attributes.daily_forecast.slice(0, forecastItems);
-	  const hourly_forecast = weather.attributes.hourly_forecast.slice(0, forecastItems);
+      
+      const forecast = (this._forecast_daily || []).slice(0, forecastItems || 7);
+      const hourly = (this._forecast_hourly || []).slice(0, 24);
 
       return p`
-      <ha-card header="${config.title}">	    
+      <ha-card header="${config.title}">       
         <div class="card">
           ${this.renderMain()}
-		  ${this.renderKeypoint()}
-		  ${this.renderWarning()}
+          ${this.renderKeypoint()}
+          ${this.renderWarning()}
           ${this.renderAttributes()}
-		  ${config.show_daily_forecast == false ? ``: p`
-		  <div class="divider"></div>
+          
+          ${config.show_daily_forecast == false ? ``: (forecast.length === 0 ? p`<div style="text-align:center; padding:10px; opacity:0.5;">数据同步中...</div>` : p`
+          <div class="divider"></div>
 
-		  <div class="conditions">
+          <div class="conditions" style="position:relative; z-index:5;">
             ${forecast.map((item, index) => {
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1" style="font-style: normal;">${this._today(item.datetime, this.language)}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day" style="font-style: normal;">${this._today(item.datetime, this.language)}</i>
-					`
-				}
-			})
-			}
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}" style="font-style: normal;">${this._today(item.datetime, this.language)}</i>
+                `
+            })}
           </div>
           
-		  ${config.show_daily_date == false ? ``: p`
-          <div class="conditions">
+          ${config.show_daily_date == false ? ``: p`
+          <div class="conditions" style="position:relative; z-index:5;">
             ${forecast.map((item, index) => {
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1" style="font-style: normal;">${new Date(item.datetime).toLocaleDateString(this.language,{month: "2-digit",day: "2-digit"})}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day" style="font-style: normal;">${new Date(item.datetime).toLocaleDateString(this.language,{month: "2-digit",day: "2-digit"})}</i>
-					`
-				}
-			})
-			}
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}" style="font-size: 10px; font-style: normal;">${new Date(item.datetime).toLocaleDateString(this.language,{month: "2-digit",day: "2-digit"})}</i>
+                `
+            })}
           </div>`}
 
-          <div class="conditions">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-					<div class="day1">
+          <div class="conditions" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+                <div class="${dayClass}">
               <i class="icon" style="background: none, url(${this.gethfIconurl(item.icon)}) no-repeat; background-size: contain;" title="${item.text}"></i>
-            </div>
-					`
-				} else {					
-					return p`
-					<div class="day">
-              <i class="icon" style="background: none, url(${this.gethfIconurl(item.icon)}) no-repeat; background-size: contain;" title="${item.text}" ></i>
-            </div>
-					`
-				}
-			})
-			}
+                </div>
+                `
+            })}
           </div>
-		  
-		  ${config.show_condition_text == false ? ``: p`
-          <div class="conditions">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1">${item.text}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day">${item.text}</i>
-					`
-				}
-			})
-			}
+          
+          ${config.show_condition_text == false ? ``: p`
+          <div class="conditions" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}">${item.text}</i>
+                `
+            })}
           </div>`}
-		  
-		  ${config.show_wind == true ? p`
-          <div class="conditions">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1 windir">${item.winddirnight.replace("偏","").replace("风向","").replace("风","")}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day windir">${item.winddirnight.replace("偏","").replace("风向","").replace("风","")}</i>
-					`
-				}
-			})
-			}
+          
+          ${config.show_wind == true ? p`
+          <div class="conditions" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                const wd = item.winddirday || item.wind_bearing || ""; 
+                return p`
+              <i class="textdefault daybackground ${dayClass} windir">${wd.replace("偏","").replace("风向","").replace("风","")}</i>
+                `
+            })}
           </div>
-		  
-		  <div class="conditions">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1">${item.windscaleday}级</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day">${item.windscaleday}级</i>
-					`
-				}
-			})
-			}
+          <div class="conditions" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}">${item.windscaleday || "0"}级</i>
+                `
+            })}
           </div>`:''}
-		  
-		  ${config.show_daily_temperature == true ? p`
-          <div class="conditions">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1">${item.native_temperature}${this._hass.config.unit_system.temperature}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day">${item.native_temperature}${this._hass.config.unit_system.temperature}</i>
-					`
-				}
-			})
-			}
+          
+          ${config.show_daily_temperature == true ? p`
+          <div class="conditions" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}">${item.temperature}${this._hass.config.unit_system.temperature}</i>
+                `
+            })}
           </div>`:''}
+
           <div class="chart-container move1" style="display:${config.show_daily_chart == false ? 'none':'block'}">
             <canvas id="forecastChart"></canvas>
           </div>
@@ -15538,411 +15012,272 @@
 			})
 			}
           </div>
+
           ${config.show_daily_temperature == true ? p`
-          <div class="conditions move">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-              <i class="textdefault daybackground day1">${item.native_temp_low}${this._hass.config.unit_system.temperature}</i>
-					`
-				} else {					
-					return p`
-              <i class="textdefault daybackground day">${item.native_temp_low}${this._hass.config.unit_system.temperature}</i>
-					`
-				}
-			})
-			}
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+              <i class="textdefault daybackground ${dayClass}">${Math.round(item.templow)}°</i>
+                `
+            })}
           </div>`:''}
-		  
-		  ${config.show_wind == true && config.show_night == true  ? p`
-          <div class="conditions move">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-               <i class="textdefault daybackground day1">${item.windscalenight}级</i>
-					`
-				} else {					
-					return p`
-               <i class="textdefault daybackground day">${item.windscalenight}级</i>
-					`
-				}
-			})
-			}
+          
+          ${config.show_wind == true && config.show_night == true  ? p`
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+               <i class="textdefault daybackground ${dayClass}">${item.windscalenight}级</i>
+                `
+            })}
           </div>
-		  
-          <div class="conditions move">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-               <i class="textdefault daybackground day1 windir">${item.winddirnight.replace("偏","").replace("风向","").replace("风","")}</i>
-					`
-				} else {					
-					return p`
-               <i class="textdefault daybackground day windir">${item.winddirnight.replace("偏","").replace("风向","").replace("风","")}</i>
-					`
-				}
-			})
-			}
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                const wn = item.winddirnight || "";
+                return p`
+               <i class="textdefault daybackground ${dayClass} windir">${wn.replace("偏","").replace("风向","").replace("风","")}</i>
+                `
+            })}
           </div>`:''}
 
           ${config.show_night == true  ? p`
-		   ${config.show_condition_text == false ? ``: p`
-		  <div class="conditions move">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-					   <i class="textdefault daybackground day1">${item.textnight}</i>
-					`
-				} else {					
-					return p`
-					   <i class="textdefault daybackground day">${item.textnight}</i>
-					`
-				}
-			})
-			}
-		   </div>`}
-		  
-		  <div class="conditions move">
-            ${forecast.map((item, index) => {				
-				if (index === 0) {					
-					return p`
-					<div class="day1">
-					   <i class="icon" style="background: none, url(${this.gethfIconurl(item.iconnight)}) no-repeat; background-size: contain;" title="${item.textnight}"></i>
-					</div>
-					`
-				} else {					
-					return p`
-					<div class="day">
-					   <i class="icon" style="background: none, url(${this.gethfIconurl(item.iconnight)}) no-repeat; background-size: contain;" title="${item.textnight}"></i>
-					</div>
-					`
-				}
-			})
-			}
+           ${config.show_condition_text == false ? ``: p`
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+                   <i class="textdefault daybackground ${dayClass}">${item.textnight}</i>
+                `
+            })}
+           </div>`}
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${forecast.map((item, index) => {                
+                const dayClass = index === 0 ? "day1" : "day";
+                return p`
+                <div class="${dayClass}">
+                   <i class="icon" style="background: none, url(${this.gethfIconurl(item.iconnight)}) no-repeat; background-size: contain;" title="${item.textnight}"></i>
+                </div>
+                `
+            })}
           </div>`:''}
-
-		 `}
-		 ${config.show_hourly_forecast == false ? ``: p`
-		  <div class="divider move2"></div>
-		  <div class="chart-container move">
+         `)}
+         
+         ${config.show_hourly_forecast == false ? ``: (hourly.length === 0 ? p`<div style="text-align:center; padding:10px; opacity:0.5;">同步小时数据...</div>` : p`
+          <div class="divider move2"></div>
+          <div class="chart-container move">
             <canvas id="forecasthourlyChart"></canvas>
           </div>
-		  <div class="conditions move">
-            ${hourly_forecast.map((item) => p`
+          <div class="conditions move" style="position:relative; z-index:5;">
+            ${hourly.map((item) => p`
             <i class="icon" style="background: none, url(${this.gethfIconurl(item.icon)}) no-repeat; background-size: contain;" title="${item.text}"></i>
             `)}
-          </div>`}
+          </div>`)}
         </div>
       </ha-card>
     `;
     }
-	
-	
-
-    renderMain({config, sun, weather, temperature} = this) {      
+    
+    renderMain({config, sun, weather, temperature} = this) {       
       return p`
-	  <style>
-        ha-icon {
-          color: var(--paper-item-icon-color);
-        }
-        .card {
-          padding: 0 18px 18px 18px;
-        }
+      <style>
+        ha-icon { color: var(--paper-item-icon-color); }
+        .card { padding: 0 18px 18px 18px; }
         .header {
           font-family: var(--paper-font-headline_-_font-family);
-          -webkit-font-smoothing: var(
-            --paper-font-headline_-_-webkit-font-smoothing
-          );
+          -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
           font-size: var(--paper-font-headline_-_font-size);
           font-weight: var(--paper-font-headline_-_font-weight);
           letter-spacing: var(--paper-font-headline_-_letter-spacing);
           line-height: var(--paper-font-headline_-_line-height);
-          text-rendering: var(
-            --paper-font-common-expensive-kerning_-_text-rendering
-          );
+          text-rendering: var(--paper-font-common-expensive-kerning_-_text-rendering);
           opacity: var(--dark-primary-opacity);
           padding: 24px 16px 5px;
           display: flex;
           justify-content: space-between;
         }
-        .header div {
-          display: flex;
-        }
-		.header span {
-			font-size: 24px;
-		}
+        .header div { display: flex; }
+        .header span { font-size: 24px; }
         .title {
-          margin-left: 4px;
-          font-size: 12px;
-		  align-items: baseline;
-          color: var(--secondary-text-color);
-		  min-width: 48px;
+          margin-left: 4px; font-size: 12px; align-items: baseline;
+          color: var(--secondary-text-color); min-width: 48px;
         }
         .time {
-          font-size: 12px;
-          color: var(--secondary-text-color);
-          align-items: baseline;
-		  min-width: 118px;
+          font-size: 12px; color: var(--secondary-text-color); align-items: baseline; min-width: 118px;
         }
         .now {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
         }
         .main {
-          display: flex;
-          font-size: 44px;
-          align-items: center;
-          line-height: 1em;
+          display: flex; font-size: 44px; align-items: center; line-height: 1em;
         }
         .main ha-icon {
-          --iron-icon-height: 72px;
-          --iron-icon-width: 72px;
-          margin-right: 8px;
+          --iron-icon-height: 72px; --iron-icon-width: 72px; margin-right: 8px;
         }
-        .main div {
-          cursor: pointer;
-          margin-top: -11px;
-        }
-        .main sup {
-          font-size: 24px;
-        }
+        .main div { cursor: pointer; margin-top: -11px; }
+        .main sup { font-size: 24px; }
         .day {
-          flex: 1;
-          display: block;
-          text-align: center;
+          flex: 1; display: block; text-align: center;
           color: var(--primary-text-color);          
-		  border-right: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};	    
-          line-height: 2;
-          box-sizing: border-box;
+          border-right: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};       
+          line-height: 2; box-sizing: border-box;
         }
-		.day1 {
-          flex: 1;
-          display: block;
-          text-align: center;
+        .day1 {
+          flex: 1; display: block; text-align: center;
           color: var(--primary-text-color);          
-		  border-left: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
-		  border-right: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
-          line-height: 2;
-          box-sizing: border-box;
+          border-left: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
+          border-right: 0.1em solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
+          line-height: 2; box-sizing: border-box;
         }
-		.windir {
-			font-size: 12px;
-		}
+        .windir { font-size: 12px; }
         .divider {
-			height: 5px; 
-			padding 2px; 
-			border-bottom: thin solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
-		}
-		.daybackground{
-			background: none;
-			background-size: contain;
-		}
+            height: 5px; padding 2px; 
+            border-bottom: thin solid ${config.show_thick_border == true ? `#dedede;` : 'var(--divider-color)'};
+        }
+        .daybackground{ background: none; background-size: contain; }
         .suggestion {
-          cursor: pointer;
-          display: flex;
-          font-size: 12px;
-          color: var(--secondary-text-color);
-          justify-content: space-between;
+          cursor: pointer; display: flex; font-size: 12px;
+          color: var(--secondary-text-color); justify-content: space-between;
         }
-        .suggestion div {
-          margin-left: 10px;
-        }
+        .suggestion div { margin-left: 10px; }
         .attributes {
-          cursor: pointer;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin: 5px 0px 10px 0px;
+          cursor: pointer; display: flex; justify-content: space-between;
+          align-items: center; margin: 5px 0px 10px 0px;
         }
         .chart-title {
-          font-size: 16px;
-          margin: 15px 0px 5px 0px;
-          text-align: center;
-          font-weight: 600; 
+          font-size: 16px; margin: 15px 0px 5px 0px; text-align: center; font-weight: 600; 
         }
         .conditions {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin: 0px 4.5px 0px 4.5px;
+          display: flex; justify-content: space-between; align-items: center; margin: 0px 4.5px 0px 4.5px;
         }
-        .move {
-          position: relative;
-          top: -29px;
+        .move { position: relative; top: -29px; }
+        .move1 { position: relative; top: -5px; }
+        .move2 { position:relative; top: -34px; }
+        .aqi, .alarm {
+          font-size: 16px; border-radius: 3px; color: #fff; line-height: 20px;
+          padding: 2px 5px 2px 5px; margin: 0px 0px 0px 10px; height: 20px;
         }
-        .move1 {
-          position: relative;
-          top: -5px;
-        }
-        .move2 {
-          position:relative;
-          top: -34px;
-        }
-        .aqi,
-        .alarm {
-          font-size: 16px;
-          border-radius: 3px;
-          color: #fff;
-          line-height: 20px;
-          padding: 2px 5px 2px 5px;
-          margin: 0px 0px 0px 10px;
-          height: 20px;
-        }
-        .aqi_level_0_bg {
-          background-color: #40c057;
-        }
-        .aqi_level_1_bg{
-          background-color: #82c91e;
-        }
-        .aqi_level_2_bg {
-          background-color: #f76707;
-        }
-        .aqi_level_3_bg {
-          background-color: #e03131;
-        }
-        .aqi_level_4_bg {
-          background-color: #841c3c;
-        }
-        .aqi_level_5_bg{
-          background-color: #540822;
-        }
-        .alarm {
-          background-color: rgb(21, 123, 255)
-        }
+        .aqi_level_0_bg { background-color: #40c057; }
+        .aqi_level_1_bg { background-color: #82c91e; }
+        .aqi_level_2_bg { background-color: #f76707; }
+        .aqi_level_3_bg { background-color: #e03131; }
+        .aqi_level_4_bg { background-color: #841c3c; }
+        .aqi_level_5_bg { background-color: #540822; }
+        .alarm { background-color: rgb(21, 123, 255) }
         .icon.bigger {
-          width: 1.2em;
-          height: 1.2em;
-          left: 1em;
-	      right: 1em;
-		  padding-right: 8px;
+          width: 1.2em; height: 1.2em; left: 1em; right: 1em; padding-right: 8px;
           filter: invert(52%) sepia(96%) saturate(756%) hue-rotate(180deg) brightness(97%) contrast(90%);
-        }
-        .dayname {
-          text-transform: uppercase;
         }
         .icon {
-          width: 28px;
-          height: 28px;
-          display: inline-block;
-          vertical-align: middle;
-          background-size: contain;
-          background-position: center center;
-          background-repeat: no-repeat;
+          width: 28px; height: 28px; display: inline-block; vertical-align: middle;
+          background-size: contain; background-position: center center; background-repeat: no-repeat;
           text-indent: -9999px;
           filter: invert(52%) sepia(96%) saturate(756%) hue-rotate(180deg) brightness(97%) contrast(90%);
-        .textdefault {
-          width: 28px;
-          height: 28px;
-          display: inline-block;
-          vertical-align: middle;
-          background-size: contain;
-          background-position: center center;
-          background-repeat: no-repeat;		  
         }
-      </style>	  
+        .textdefault {
+          width: 28px; height: 28px; display: inline-block; vertical-align: middle;
+          background-size: contain; background-position: center center; background-repeat: no-repeat;          
+        }
+      </style>      
       <div class="header">
           <div style="align-items: baseline;">
-            <div style="align-items: baseline;  cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">
+            <div style="align-items: baseline; cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">
               <span>${weather.attributes.condition_cn}</span>
               ${this._showValue(weather.attributes.aqi) ? p`
                 <div class = "aqi ${this.aqiLevel(weather.attributes.aqi.aqi)}">${this.roundNumber(weather.attributes.aqi.aqi)}</div>
               ` : ''}
             </div>
-			<div class="title">${config.name || weather.attributes.city || weather.attributes.friendly_name}</div>
-          </div>		  
+            <div class="title">${config.name || weather.attributes.city || weather.attributes.friendly_name}</div>
+          </div>          
           <div class="time">
             <ha-icon icon="mdi:update"></ha-icon>
             <div style="margin: 0 0 0 5px">${weather.attributes.update_time}</div>
           </div>
       </div>
-	  <div class="now">
-		<div class="main">
-		  <i class="icon bigger" style="background: none, url(${this.gethfIconurl(weather.attributes.qweather_icon)}) no-repeat; background-size: contain;"></i>
-		  ${this._showValue(temperature) ? p`
-			<div style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">${this.roundNumber(temperature)}<sup>${this.getUnit('temperature')}</sup></div>
-		  ` : p`
-			<div style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">${this.roundNumber(weather.attributes.temperature)}<sup>${weather.attributes.temperature_unit}</sup></div>
-		  `}
-		  ${this._showValue(weather.attributes.alarm) ? p`
-			<div class="alarm" style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">
-			  台风预警
-			</div>
-		  ` : ''}
-		</div>
+      <div class="now">
+        <div class="main">
+          <i class="icon bigger" style="background: none, url(${this.gethfIconurl(weather.attributes.qweather_icon)}) no-repeat; background-size: contain;"></i>
+          ${this._showValue(temperature) ? p`
+            <div style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">${this.roundNumber(temperature)}<sup>${this.getUnit('temperature')}</sup></div>
+          ` : p`
+            <div style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">${this.roundNumber(weather.attributes.temperature)}<sup>${weather.attributes.temperature_unit}</sup></div>
+          `}
+          ${this._showValue(weather.attributes.alarm) ? p`
+            <div class="alarm" style="cursor: pointer;" @click="${(e) => this.showMoreInfo(config.entity)}">
+              台风预警
+            </div>
+          ` : ''}
+        </div>
 
-		<div class="suggestion" @click="${(e) => this.showMoreInfo(config.entity)}">
-		  <div>
-			<span> 舒适：${this.getSuggestion("comf")}</span><br>
-			<span> 穿衣：${this.getSuggestion("drsg")}</span><br>
-			<span> 晾晒：${this.getSuggestion("晾晒指数")}</span><br>
-			<span> 感冒：${this.getSuggestion("flu")}</span><br>	
-		  </div>
-		  <div>          
-			<span> 紫外：${this.getSuggestion("uv")}</span><br>
-			<span> 运动：${this.getSuggestion("sport")}</span><br>	
-			<span> 旅游：${this.getSuggestion("trav")}</span><br>	
-			<span> 洗车：${this.getSuggestion("cw")}</span><br>
-		  </div>
-		</div>
+        <div class="suggestion" @click="${(e) => this.showMoreInfo(config.entity)}">
+          <div>
+            <span> 舒适：${this.getSuggestion("comf")}</span><br>
+            <span> 穿衣：${this.getSuggestion("drsg")}</span><br>
+            <span> 晾晒：${this.getSuggestion("晾晒指数")}</span><br>
+            <span> 感冒：${this.getSuggestion("flu")}</span><br>    
+          </div>
+          <div>           
+            <span> 紫外：${this.getSuggestion("uv")}</span><br>
+            <span> 运动：${this.getSuggestion("sport")}</span><br>    
+            <span> 旅游：${this.getSuggestion("trav")}</span><br>    
+            <span> 洗车：${this.getSuggestion("cw")}</span><br>
+          </div>
+        </div>
       </div>
     `;
     }
-	
-	
-	renderKeypoint({config, weather} = this) {
-		if (config.show_keypoint == false)
-			return p``;
-		return p`
-		 <div>
-			<ul style="list-style:none;padding:0 0 0 14px;margin: 0;">
-			  <li style="font-weight:bold; display:${weather.attributes.forecast_minutely ? 'block':'none'}"><span class="ha-icon"
-					  ><ha-icon icon="mdi:camera-timer"></ha-icon
-					></span> ${weather.attributes.forecast_minutely}</li>
-			  <li style="display:${weather.attributes.forecast_hourly ? 'block':'none'}"><span class="ha-icon"
-					  ><ha-icon icon="mdi:clock-outline"></ha-icon
-					></span> ${weather.attributes.forecast_hourly}</li>
-			</ul>
-		  </div>
-		`;               
-	}
-	
-	renderWarning({config, weather} = this) {
-		if (config.show_warning == false)
-          return p``;
-		var alert_title = ''
-		var	alert_content = ''
-		var htmlstr =''
-		var indexstr = ''
-		var isshowtext = 'none'
-		if (config.show_warningtext == true){
-			isshowtext = 'block'
-		}
-			
-		for (let [index, content] of weather.attributes.warning.entries()){
-			alert_title = content['title']
-			alert_content =	content['text']			
-			if (weather.attributes.warning.length>1){
-				indexstr = String(index+1) + '. '
-			}
-			htmlstr += '<li style=\"font-weight:bold; color:red;\"><span class=\"ha-icon\"><ha-icon icon=\"mdi:timer-alert-outline\"></ha-icon></span> '+ indexstr +alert_title+'</li><li style=\"font-weight:nomal; color:red; display: '+isshowtext+'\"}\"><span class=\"ha-icon\"><ha-icon icon=\"mdi:message-alert-outline\"></ha-icon></span> '+alert_content+'</li>'
-		}
-		
-		return p`
-		<div>
-				<ul style="list-style:none;padding:0 0 0 14px;margin: 0;">
-				  ${this.unsafeHTML(htmlstr)}
-				</ul>
-			  </div>
-		`; 
-	}
-	
-	unsafeHTML(htmlString) {
-	  const template = document.createElement('template');
-	  template.innerHTML = htmlString;
-	  return template.content;
-	}
+    
+    renderKeypoint({config, weather} = this) {
+        if (config.show_keypoint == false) return p``;
+        return p`
+         <div>
+            <ul style="list-style:none;padding:0 0 0 14px;margin: 0;">
+              <li style="font-weight:bold; display:${weather.attributes.forecast_minutely ? 'block':'none'}"><span class="ha-icon"
+                      ><ha-icon icon="mdi:camera-timer"></ha-icon
+                    ></span> ${weather.attributes.forecast_minutely}</li>
+              <li style="display:${weather.attributes.forecast_hourly ? 'block':'none'}"><span class="ha-icon"
+                      ><ha-icon icon="mdi:clock-outline"></ha-icon
+                    ></span> ${weather.attributes.forecast_hourly}</li>
+            </ul>
+          </div>
+        `;                
+    }
+    
+    renderWarning({config, weather} = this) {
+        if (config.show_warning == false) return p``;
+        var htmlstr =''
+        var indexstr = ''
+        var isshowtext = 'none'
+        if (config.show_warningtext == true){
+            isshowtext = 'block'
+        }
+            
+        if (weather.attributes.warning) {
+            for (let [index, content] of weather.attributes.warning.entries()){
+                let alert_title = content['title']
+                let alert_content = content['text']            
+                if (weather.attributes.warning.length>1){
+                    indexstr = String(index+1) + '. '
+                }
+                htmlstr += '<li style=\"font-weight:bold; color:red;\"><span class=\"ha-icon\"><ha-icon icon=\"mdi:timer-alert-outline\"></ha-icon></span> '+ indexstr +alert_title+'</li><li style=\"font-weight:nomal; color:red; display: '+isshowtext+'\"}\"><span class=\"ha-icon\"><ha-icon icon=\"mdi:message-alert-outline\"></ha-icon></span> '+alert_content+'</li>'
+            }
+        }
+        
+        return p`
+        <div>
+           <ul style="list-style:none;padding:0 0 0 14px;margin: 0;">
+             ${this.unsafeHTML(htmlstr)}
+           </ul>
+        </div>
+        `; 
+    }
+    
+    unsafeHTML(htmlString) {
+      const template = document.createElement('template');
+      template.innerHTML = htmlString;
+      return template.content;
+    }
 
     renderAttributes({config, humidity, pressure, windSpeed, windDirection} = this) {
       if (this.unitSpeed === 'm/s') {
@@ -15951,8 +15286,7 @@
       if (this.unitPressure === 'mmHg') {
         pressure = Math.round(pressure * 0.75);
       }
-      if (config.show_attributes == false)
-        return p``;
+      if (config.show_attributes == false) return p``;
       return p`
       <div class="attributes">
         <div>
@@ -15971,8 +15305,7 @@
     }
 
     renderSun({sun, language} = this) {
-      if ( sun == undefined)
-        return p``;
+      if ( sun == undefined) return p``;
       return p`
       <ha-icon icon="mdi:weather-sunset-up"></ha-icon>
         ${new Date(this.weather.attributes.sunrise).toLocaleTimeString(language,
@@ -15981,7 +15314,7 @@
         ${new Date(this.weather.attributes.sunset).toLocaleTimeString(language,
         {hour:'2-digit', minute:'2-digit'})}
     `;
-    }	
+    }    
 
     _fire(type, detail, options) {
       const node = this.shadowRoot;
@@ -16000,25 +15333,22 @@
     showMoreInfo(entity) {
       this._fire('hass-more-info', { entityId: entity });
     }
-	
+    
   }
 
 
-  // 解决“Cannot instantiate a custom element inside its own constructor”错误
   if (!customElements.get('qweather-card')) {
-      // 稍微延迟注册，避免升级冲突错误。
       window.setTimeout(() => {
           customElements.define('qweather-card', WeatherChartCard);
       }, 0);
   }
 
-  // 添加预览
   window.customCards = window.customCards || [];
   window.customCards.push({
-	type: "qweather-card",
-	name: "官方接口和风天气",
-	preview: true,
-	description: "官方接口和风天气卡片"
+    type: "qweather-card",
+    name: "官方接口和风天气",
+    preview: true,
+    description: "官方接口和风天气卡片"
   });
 
 })));
