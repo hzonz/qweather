@@ -113,6 +113,8 @@ service: ha_cloud_music.tts
 ![1](https://github.com/dscao/qweather/assets/16587914/fb564690-e73b-4e60-b2ed-7ff211e84ee5)
 
 
+<img width="550" height="673" alt="1" src="https://github.com/user-attachments/assets/338e80fd-23f1-4728-b74c-cbca28b38720" />
+
 ![2](https://github.com/dscao/qweather/assets/16587914/ce7f01cd-738a-4d94-8db0-743215709782)
 
 
