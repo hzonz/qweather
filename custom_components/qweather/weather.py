@@ -57,7 +57,7 @@ from .condition import CONDITION_MAP, EXCEPTIONAL
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION = "2026.02.01" 
+VERSION = "2026.2.5" 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up QWeather entry."""
@@ -156,7 +156,8 @@ class HeFengWeather(WeatherEntity):
         return self._data._hourly_forecast
 
     @property
-    def state_attributes(self):
+    def extra_state_attributes(self):
+        """Return the state attributes."""
         data = self._data
         attrs = super().state_attributes or {}
         if data._condition:
@@ -196,11 +197,22 @@ class Suggestion:
 
 @dataclass
 class WarningData:
-    title: str
-    type: str
-    level: str
-    status: str
-    text: str
+    id: str             # 预警ID
+    sender: str         # 发布单位
+    pubTime: str        # 发布时间
+    title: str          # 标题
+    startTime: str      # 开始时间
+    endTime: str        # 结束时间
+    status: str         # 状态 (active/update/cancel)
+    level: str          # 等级 (蓝色/黄色/橙色/红色)
+    severity: str       # 严重程度 (Unknown/Minor/Moderate/Severe/Extreme)
+    severityColor: str  # 严重程度颜色
+    type: str           # 预警类型ID
+    typeName: str       # 预警类型名称
+    urgency: str        # 紧迫程度
+    certainty: str      # 确定性
+    text: str           # 详细描述
+    related: str        # 关联的预警ID
 
 class WeatherData:
     def __init__(self, hass, name, unique_id, host, config, usetoken, location, options):
@@ -331,11 +343,13 @@ class WeatherData:
             for d in daily_resp['daily']:
                 raw_date = d.get('fxDate')
                 if raw_date and "T" not in raw_date:
+                    # 将 "2026-02-01" 转换为 "2026-02-01T00:00:00"
                     fixed_datetime = f"{raw_date}T00:00:00"
                 else:
                     fixed_datetime = raw_date
                     
                 new_daily.append({
+                    # 标准 HA 字段
                     "datetime": fixed_datetime,
                     "native_temperature": float(d.get('tempMax', 0)),
                     "native_templow": float(d.get('tempMin', 0)),
@@ -345,6 +359,7 @@ class WeatherData:
                     "native_wind_speed": float(d.get('windSpeedDay', 0)),
                     "wind_bearing": float(d.get('wind360Day', 0)),
                     "humidity": float(d.get("humidity", 0)),
+                    
                     # 扩展字段 (供自定义卡片使用)
                     "text": d.get('textDay'),           # 白天天气文字
                     "icon": d.get('iconDay'),           # 白天图标代码
@@ -375,6 +390,7 @@ class WeatherData:
                 except:
                     time_iso = h_item.get("fxTime")
                 new_hourly.append({
+                    # 标准 HA 字段
                     "datetime": time_iso,
                     "native_temperature": float(h_item.get('temp', 0)),
                     "condition": CONDITION_MAP.get(h_item.get('icon'), "exceptional"),
@@ -383,6 +399,7 @@ class WeatherData:
                     "humidity": float(h_item.get('humidity', 0)),
                     "native_wind_speed": float(h_item.get('windSpeed', 0)),
                     "wind_bearing": float(h_item.get('wind360', 0)),
+                    
                     # 扩展字段
                     "native_precipitation_probability": int(h_item.get('pop', 0)), # 降水概率
                     "text": h_item.get('text'),   # 天气文字
@@ -415,10 +432,30 @@ class WeatherData:
 
         # 5. Others (Warning & Indices & Astronomy & Minutely)
         warn_resp = await fetch(f"https://{self._host}/v7/warning/now?location={self._location}", 'warning')
+        
         if warn_resp and 'warning' in warn_resp:
-            self._weather_warning = [WarningData(title=w.get('title'), type=w.get('typeName'), level=w.get('level'), status=w.get('status'), text=w.get('text')) for w in warn_resp['warning']]
+            self._weather_warning = [
+                WarningData(
+                    id=w.get('id', ''),
+                    sender=w.get('sender', ''),
+                    pubTime=w.get('pubTime', ''),
+                    title=w.get('title', ''),
+                    startTime=w.get('startTime', ''),
+                    endTime=w.get('endTime', ''),
+                    status=w.get('status', ''),
+                    level=w.get('level', ''),
+                    severity=w.get('severity', ''),
+                    severityColor=w.get('severityColor', ''),
+                    type=w.get('type', ''),
+                    typeName=w.get('typeName', ''),
+                    urgency=w.get('urgency', ''),
+                    certainty=w.get('certainty', ''),
+                    text=w.get('text', ''),
+                    related=w.get('related', '')
+                ) for w in warn_resp['warning']
+            ]
         else:
-             self._weather_warning = [] # Clear if no warning
+            self._weather_warning = [] # Clear if no warning
         
         if self._options.get(CONF_LIFEINDEX, True):
             idx_resp = await fetch(f"https://{self._host}/v7/indices/1d?type=0&location={self._location}", 'indices')
@@ -428,7 +465,10 @@ class WeatherData:
         # 6. Geo (City Lookup)
         if self._city is None:
             try:
+                # GeoAPI 使用独立的域名 geoapi.qweather.com
                 geo_url = f"https://geoapi.qweather.com/v2/city/lookup?location={self._location}&lang=zh"
+                
+                # 复用上面已经定义好的 headers (包含 token 或 api key)
                 async with self._session.get(geo_url, headers=headers, timeout=10) as resp:
                     geo_data = await resp.json()
                     if geo_data.get("code") == "200" and geo_data.get("location"):
@@ -437,10 +477,10 @@ class WeatherData:
                         _LOGGER.info("[%s] City initialized: %s", self._name, self._city)
                     else:
                         _LOGGER.warning("[%s] GeoAPI failed: %s", self._name, geo_data.get("code"))
-                        self._city = "未知"
+                        self._city = "未知" # 避免反复请求失败
             except Exception as e:
                 _LOGGER.error("[%s] GeoAPI Request Error: %s", self._name, e)
-                self._city = "未知"
+                self._city = "未知" # 出错暂定未知，下次重启再试
         
         today_str = datetime.now().strftime("%Y%m%d")
         sun_resp = await fetch(f"https://{self._host}/v7/astronomy/sun?location={self._location}&date={today_str}", 'sun')
