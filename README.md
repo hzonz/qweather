@@ -30,7 +30,7 @@
 3. 在存储库字段输入：`https://github.com/hzonz/qweather`
 4. 类别选择"集成"
 5. 点击"添加"保存
-6. 在HACS中找到"和风天气"集成并点击安装
+6. 在HACS中找到"和风天气Pro"集成并点击安装
 7. 重启Home Assistant
 
 ### 手动安装
