@@ -1,13 +1,16 @@
 {
   "domain": "qweather",
-  "name": "和风天气－官方API版",
-  "codeowners": ["dscao"],
-  "config_flow": true,		
-  "documentation": "https://github.com/dscao/qweather",	
-  "dependencies": [],	
+  "name": "QWeather (和风天气)",
+  "version": "1.0.0",
+  "codeowners": ["@hzonz"],
+  "config_flow": true,
+  "integration_type": "service",
+  "documentation": "https://github.com/hzonz/qweather",
+  "issue_tracker": "https://github.com/hzonz/qweather/issues",
   "iot_class": "cloud_polling",
-  "requirements": ["requests", "beautifulsoup4"],
-  "version": "2026.2.5"
+  "requirements": [
+    "PyJWT>=2.4.0",
+    "cryptography>=41.0.0"
+  ],
+  "homeassistant": "2026.1.0"
 }
-
-
