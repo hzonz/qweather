@@ -1,6 +1,6 @@
 # 和风天气Pro (QWeather Pro)
 
-[![Release](https://img.shields.io/github/v/release/hzonz/workchat_integration)](https://github.com/hzonz/qweather/releases)
+[![Release](https://img.shields.io/github/v/release/hzonz/qweather)](https://github.com/hzonz/qweather/releases)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/qweather/blob/main/LICENSE)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
