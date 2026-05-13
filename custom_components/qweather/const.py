@@ -1,81 +1,53 @@
-VERSION = '2026.2.1'
-ROOT_PATH = '/qweather-local'
-DEFAULT_NAME = "和风天气"
-DOMAIN = "qweather"
-PLATFORMS = ["weather"]
+"""QWeather (和风天气) 集成常量定义."""
+from __future__ import annotations
 
-ATTRIBUTION = "Data provided by Qweather"
-MANUFACTURER = "Qweather, Inc."
+from typing import Final
+from homeassistant.const import Platform
 
-CONF_LOCATION_ID = "location_id"
-CONF_API_KEY = "api_key"
-CONF_API_VERSION = "api_version"
-CONF_USE_TOKEN = "use_token"
-CONF_LOCATION = "location"
-CONF_ALERT = "alert"
-CONF_LIFEINDEX = "life"
-CONF_CUSTOM_UI = "custom_ui"
-CONF_HOURLYSTEPS = "hourlysteps"
-CONF_DAILYSTEPS = "dailysteps"
-CONF_STARTTIME = "starttime"
-CONF_UPDATE_INTERVAL = "update_interval_minutes"
-CONF_GIRD = "grid_weather"
-CONF_PROJECT_ID = "project_id"
-CONF_KEY_ID = "key_id"
-CONF_PRIVATE_KEY = "private_key"
+# --- 基础信息 ---
+DOMAIN: Final = "qweather"
+VERSION: Final = "1.0.0"
+MANUFACTURER: Final = "QWeather"
+ATTRIBUTION: Final = "Data provided by QWeather"
 
-ATTR_CONDITION_CN = "condition_cn"
-ATTR_UPDATE_TIME = "update_time"
-ATTR_AQI = "aqi"
-ATTR_DAILY_FORECAST = "daily_forecast"
-ATTR_HOURLY_FORECAST = "hourly_forecast"
-ATTR_MINUTELY_FORECAST = "minutely_forecast"
-ATTR_SUGGESTION = "suggestion"
-ATTR_CUSTOM_UI_MORE_INFO = "custom_ui_more_info"
-ATTR_FORECAST_PROBABLE_PRECIPITATION = 'probable_precipitation'
+# --- 支持的平台 ---
+PLATFORMS: Final = [Platform.WEATHER, Platform.SENSOR]
 
-CONDITION_CLASSES = {
-    'sunny': ["晴"],
-    'cloudy': ["多云"],
-    'partlycloudy': ["少云", "晴间多云", "阴"],
-    'windy': ["有风", "微风", "和风", "清风"],
-    'windy-variant': ["强风", "疾风", "大风", "烈风"],
-    'hurricane': ["飓风", "龙卷风", "热带风暴", "狂暴风", "风暴"],
-    'rainy': ["雨", "毛毛雨", "小雨", "中雨", "大雨", "阵雨", "极端降雨"],
-    'pouring': ["暴雨", "大暴雨", "特大暴雨", "强阵雨"],
-    'lightning-rainy': ["雷阵雨", "强雷阵雨"],
-    'fog': ["雾", "薄雾"],
-    'hail': ["雷阵雨伴有冰雹"],
-    'snowy': ["雪", "小雪", "中雪", "大雪", "暴雪", "阵雪"],
-    'snowy-rainy': ["雨夹雪", "雨雪天气", "阵雨夹雪"],
-}
-TRANSLATE_SUGGESTION = {
-    'air': '空气污染扩散条件指数',
-    'drsg': '穿衣指数',
-    'uv': '紫外线指数',
-    'comf': '舒适度指数',
-    'flu': '感冒指数',
-    'sport': '运动指数',
-    'trav': '旅游指数',
-    'cw': '洗车指数',
-}
-SUGGESTIONTPYE2NAME = {
-    '1': 'sport',
-    '2': 'cw',
-    '3': 'drsg',
-    '4': '钓鱼指数',
-    '5': 'uv',
-    '6': 'trav',
-    '7': '过敏指数',
-    '8': 'comf',
-    '9': 'flu',
-    '10': 'air',
-    '11': '空调开启指数',
-    '12': '太阳镜指数',
-    '13': '化妆指数',
-    '14': '晾晒指数',
-    '15': '交通指数',
-    '16': '防晒指数',
+# --- 配置流用到的键名 (Config & Options) ---
+CONF_API_KEY: Final = "api_key"
+CONF_LOCATION_ID: Final = "location_id"
+CONF_LOCATION_NAME: Final = "location_name"
+CONF_USE_TOKEN: Final = "use_token"
+CONF_PROJECT_ID: Final = "project_id"
+CONF_KEY_ID: Final = "key_id"
+CONF_PRIVATE_KEY: Final = "private_key"
+
+CONF_UPDATE_INTERVAL: Final = "update_interval"
+CONF_HOURLYSTEPS: Final = "hourlysteps"
+CONF_DAILYSTEPS: Final = "dailysteps"
+CONF_LIFEINDEX: Final = "lifeindex"
+
+# --- 补全缺失的常量 (用于 Coordinator 和 OptionsFlow) ---
+CONF_ALERT: Final = "alert"          # <--- 修复 ImportError 的关键
+CONF_GIRD: Final = "gird"            # 对应网格天气选项
+CONF_CUSTOM_UI: Final = "custom_ui"  # 对应自定义 UI 选项
+
+# --- 属性扩展键名 ---
+ATTR_UPDATE_TIME: Final = "update_time"
+ATTR_AQI: Final = "aqi"
+ATTR_SUGGESTION: Final = "suggestion"
+
+# --- 生活指数类型映射 (QWeather API v7) ---
+SUGGESTION_TYPE_MAP: Final[dict[str, str]] = {
+    "1": "sport",    "2": "cw",       "3": "drsg",     "4": "fishing",
+    "5": "uv",       "6": "trav",     "7": "ag",       "8": "comf",
+    "9": "flu",      "10": "air",     "11": "ac",      "12": "gls",
+    "13": "mu",      "14": "dc",      "15": "ptfc",    "16": "fsh",
 }
 
-
+SUGGESTION_NAME_MAP: Final[dict[str, str]] = {
+    "sport": "运动指数", "cw": "洗车指数", "drsg": "穿衣指数", "fishing": "钓鱼指数",
+    "uv": "紫外线指数", "trav": "旅游指数", "ag": "过敏指数", "comf": "舒适度指数",
+    "flu": "感冒指数", "air": "空气指数", "ac": "空调指数", "gls": "太阳镜指数",
+    "mu": "化妆指数", "dc": "晾晒指数", "ptfc": "交通指数", "fsh": "防晒指数",
+}
