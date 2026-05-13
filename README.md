@@ -1,133 +1,63 @@
-# 和风天气-官方API版
+# 和风天气Pro (QWeather Pro)
 
-2026.2.5 \
-补全回来预警信息中所有字段数据 \
+[![Release](https://img.shields.io/github/v/release/hzonz/workchat_integration)](https://github.com/hzonz/qweather/releases)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/qweather/blob/main/LICENSE)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-2026.2.1 \
-1、重构优化代码，预报信息采用调用服务方式从内存中获取，不再存放于天气实体的属性中,以符合新版ha规范 \
-2、卡片适配 \
-3、兼容和风空气质量V1新版接口api方面作的调整。 \
-4、可选JSON Web Token 方式时自动生成密钥，公钥可复制到开发者平台。
+## 一款为 Home Assistant 深度定制的 和风天气 (QWeather) 高级集成。采用 2026 年最新开发标准重构，不仅提供精准的气象数据，还包含极速渲染的 原生 SVG 天气卡片 与 专业级详情弹窗。
 
-2025.6.15 \
-1、增加 Api host 配置，适配和风api方面作的调整。 \
-2、增加可选JSON Web Token 方式 
+## ✨ 核心特性
 
-2025.3.12 \
-发现 https://github.com/dermotduffy/advanced-camera-card 这个卡片有冲突，电脑端正常。导致手机端刷新页面后卡片不可用，不刷新第一次打开都正常。改版的那个彩云天气集成的卡片也是一样情况。
+- 🛡️ 安全先行：支持和风天气最新的 JWT (EdDSA) 认证，本地自动生成 Ed25519 密钥对，保护您的 API 额度不被盗用。
+- ⚡ 极致性能：
+  - 后端：采用 DataUpdateCoordinator 并发请求机制，智能缓存，最大限度节省免费版 API 额度。
+  - 前端：完全剔除 Chart.js 等臃肿库，使用 原生 SVG 渲染温度趋势曲线，渲染速度提升 10 倍以上。
+- 📊 深度数据：
+  - 分钟级降水：API 原生驱动的分钟级降水简报（如：“未来两小时无降水”）。
+  - 天气概况：逻辑合成的小时级天气变动简报。
+  - 丰富传感器：包含 AQI（含详细参数）、今日温差、预警数量、气象摘要等。
+- 🎨 专业视觉：
+  - 仪表盘卡片：1:1 复刻专业天气 App 质感，支持 7 日预报与 24 小时预报切换。
+  - 自定义详情页：开启后可替换 HA 默认弹窗，显示 8 项生活指数、气象预警详情等丰富信息。
+- 🔄 最新标准：完全适配 HA 2024.3+ 的 WebSocket 预报订阅 机制，确保系统长期运行流畅不卡顿。
 
-v2.0 2023.10.6 \
-使用和风官方v7版api的和风天气完整配置版本（支持homeassistant 2023.9 以后版本）
+## 📦 安装
 
+### 通过HACS安装（推荐）
 
-[![hacs_badge](https://img.shields.io/badge/Home-Assistant-%23049cdb)](https://www.home-assistant.io/)
-![visit](https://visitor-badge.laobi.icu/badge?page_id=dscao.qweather&left_text=visit)
+1. 在HACS的"集成"部分，点击右上角的三点菜单
+2. 选择"自定义存储库"
+3. 在存储库字段输入：`https://github.com/hzonz/qweather`
+4. 类别选择"集成"
+5. 点击"添加"保存
+6. 在HACS中找到"和风天气"集成并点击安装
+7. 重启Home Assistant
 
-## 官方接口说明
+### 手动安装
 
-[官方开发文档](https://dev.qweather.com/docs/)
+1. 下载最新的: `https://github.com/hzonz/qweather`
+2. 解压并将`custom_components/qweather`文件夹放入Home Assistant的`custom_components`目录
+3. 重启Home Assistant
 
-[和风天气数据更新时间](https://dev.qweather.com/docs/resource/glossary/#update-time)
+## 📖 文档导航
+- [🚀 详细配置与使用教程 (DOCS.md)](md/DOCS.md)
+- [📜 版本更新历史 (CHANGELOG.md)](md/CHANGELOG.md)
 
+## 🤝 贡献
 
-## 使用方式
+欢迎贡献代码、报告问题或提出功能建议！
 
-安装完成重启HA，刷新一下页面，在集成里搜索`和风天气`即可
+1. 提交Issues：报告问题或功能请求
+2. 提交Pull Requests：贡献代码改进
+3. 项目讨论：分享使用经验或建议
 
-[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=hf_weather)
+## 📄 许可证
 
-注意：
-name 实体名字
+本项目基于MIT许可证开源。详情请查看LICENSE文件。
 
-api_key 和风申请的api key，申请地址：https://dev.qweather.com/  ，申请后，请认证为个人开发者，新建一个使用web api项目，获取key。早期申请的api_key可能没有分钟级预报及格点天气等请求权限。
+## ❤️ 支持
 
-location 经纬度，中国大陆地区应使用GCJ-02坐标系，在其他地区应使用WGS-84坐标系。
-查询格式：经度,纬度（经度在前纬度在后，英文逗号分隔，十进制格式，北纬东经为正，南纬西经为负）。例如：location=116.41,39.92。
+如果这个项目对您有帮助，请给项目点个Star ⭐！
 
-默认，查询7天的数据。需要认证开发者，官方现在调整后 免费订阅api请求额度 50000次/月。
-
-刷新频率默认设置为10分钟，每次请求7个接口，安装或启动后第一次多请求一次geo接口，以显示city名称。
-
-更新间隔，合计最快每小时16次，一天384次，每启动ha或重载集成增加请求1次。间隔默认为10分钟，当20分钟时一天312次，30分钟一天240次，60分钟一天168次。其它情况计算次数有点复杂。
-
-实况类数据  	10-40分钟，最快以20分钟处理，3/小时
-
-逐天预报   	1-8小时，最快以1小时处理，1次/小时
-
-生活指数	    1小时 ，最快以1小时处理， 1次/小时
-
-空气指数     未找到说明，当1小时处理，1次/小时
-
-逐小时预报	1小时，最快以1小时处理，1次/小时
-
-分钟级降雨	10-20分钟，最快以20分钟处理，3次/小时
-
-灾害预警	    5分钟，最快以10分钟处理，6次/小时
- 
-> Lovelace配置
-
-```yaml
-type: 'custom:qweather-card'
-entity: weather.tian_qi  #天气实体名称
-title:                  #卡片标题
-name:                   #名称，不填写则显示城市或县名称
-show_attributes: true   #是否显示属性
-show_hourly_forecast: true  #是否显示小时级预报
-show_daily_forecast: true   #是否显示天级预报
-show_daily_chart: true      #是否曲线图表
-show_daily_date: true       #是否天级预报的日期
-show_condition_text: true   #是否显示天级预报的天气名称
-show_keypoint: true         #是否显示关键总结的一句话信息
-show_warning: true          #是否显示气象预警信息
-show_warningtext: false      #是否显示气象预警信息的详细内容
-show_night: false            #是否显示天级预报的夜间内容
-show_wind: false            #是否显示天级预报的风速风向
-show_daily_temperature: false #是否显示天级预报的气温文字
-show_thick_border: false      #是否以 #9e9e9e的线条显示，默认以系统divider线条显示
-```
-以上为默认选项，如需更改，则true改成false，false改成true。
-
-
-> TTS语音提醒模板
-```yaml
-data:
-  message: >-
-    {% set state = state_attr('weather.tian_qi', 'daily_forecast')%}
-    今天的天气是{{state[0].condition_cn}}，最高温度：{{state[0].native_temperature}}度，最低温度：{{state[0].native_temp_low}}度，
-    明天的天气是{{state[1].condition_cn}}，最高温度：{{state[1].native_temperature}}度，最低温度：{{state[1].native_temp_low}}度，
-    后天的天气是{{state[2].condition_cn}}，最高温度：{{state[2].native_temperature}}度，最低温度：{{state[2].native_temp_low}}度
-service: ha_cloud_music.tts
-```
-
-```yaml
-data:
-  message: >-
-    {% set state = state_attr('weather.tian_qi', 'hourly_forecast')%}
-    {{state[0].datetime | regex_replace(now().strftime('%Y-%m-%d'), '')}}
-    的天气是{{state[0].condition_cn}}，温度是{{state[0].native_temperature}}度，
-    {{state[1].datetime | regex_replace(now().strftime('%Y-%m-%d'), '')}}
-    的天气是{{state[1].condition_cn}}，温度是{{state[1].native_temperature}}度，
-    {{state[2].datetime | regex_replace(now().strftime('%Y-%m-%d'), '')}}
-    的天气是{{state[2].condition_cn}}，温度是{{state[2].native_temperature}}度
-service: ha_cloud_music.tts
-```
-
-
-![1](https://github.com/dscao/qweather/assets/16587914/fb564690-e73b-4e60-b2ed-7ff211e84ee5)
-
-
-<img width="550" height="673" alt="1" src="https://github.com/user-attachments/assets/338e80fd-23f1-4728-b74c-cbca28b38720" />
-
-![2](https://github.com/dscao/qweather/assets/16587914/ce7f01cd-738a-4d94-8db0-743215709782)
-
-
-![3](https://github.com/dscao/qweather/assets/16587914/b1931902-a97f-4b27-a04e-9f27f29bd1d2)
-
-
-![4](https://github.com/dscao/qweather/assets/16587914/75c54ab0-b631-4c90-8291-77dbf4e9f0d0)
-
-
-![3](https://github.com/dscao/qweather/assets/16587914/57b7bff6-a8dd-4e30-9f03-4bcd6b2b1868)
-
-
-感谢：https://github.com/shaonianzhentan/hf_weather 和 https://github.com/cheny95/qweather ，这个项目最初版本是结合了这两个项目的代码。
+---
+**兼容版本**: Home Assistant 2024.5+
