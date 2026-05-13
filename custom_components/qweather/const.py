@@ -7,8 +7,8 @@ from homeassistant.const import Platform
 # --- 基础信息 ---
 DOMAIN: Final = "qweather"
 VERSION: Final = "1.0.0"
-MANUFACTURER: Final = "QWeather"
-ATTRIBUTION: Final = "Data provided by QWeather"
+MANUFACTURER: Final = "QWeather Pro"
+ATTRIBUTION: Final = "Data provided by QWeather Pro"
 
 # --- 支持的平台 ---
 PLATFORMS: Final = [Platform.WEATHER, Platform.SENSOR]
