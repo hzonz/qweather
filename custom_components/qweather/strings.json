@@ -1,0 +1,70 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure QWeather",
+        "data": {
+          "host": "API Host",
+          "name": "Integration Name",
+          "location_id": "Location (Lon,Lat or City name)",
+          "use_token": "Use JWT Authentication (Recommended)",
+          "api_key": "Ordinary API Key (Leave blank if using JWT)"
+        }
+      },
+      "jwt_setup": {
+        "title": "JWT Security Configuration",
+        "description": "The system has generated a public key for you.\n\n1. Copy the **Public Key** below.\n2. Add it to [QWeather Console](https://console.qweather.com) as a **JSON Web Token** credential.\n\n```text\n{public_key}\n```\n\nThen enter the IDs below.",
+        "data": {
+          "project_id": "Project ID",
+          "key_id": "Key ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to QWeather server.",
+      "invalid_auth": "Authentication failed. Check your Key or JWT credentials.",
+      "jwt_error": "JWT signature failed. Please check the generated keys.",
+      "api_key_missing": "API Key is required for Standard Mode.",
+      "location_not_found": "Location not found."
+    },
+    "abort": {
+      "already_configured": "This location is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Integration Options",
+        "description": "### 💡 Usage Notes\n- **Forecast Limits**: For the **Free Version**, Daily Forecast should be **3** or **7** days, and Hourly Forecast should be **24** hours.\n- **Grid Weather**: When using High Precision Grid API, certain observation data (e.g., **Visibility**) will not be available and will show as `--` on the card.",
+        "data": {
+          "update_interval": "Update Interval (minutes)",
+          "dailysteps": "Daily Forecast Days (3-15)",
+          "hourlysteps": "Hourly Forecast Hours (24-168)",
+          "alert": "Enable Weather Alerts",
+          "lifeindex": "Enable Life Indices",
+          "gird": "Use Grid API (High Precision)",
+          "custom_ui": "Enable Custom UI Support"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "aqi": {
+        "name": "Air Quality"
+      },
+      "warning_count": {
+        "name": "Weather Warnings"
+      },
+      "today_temp_range": {
+        "name": "Today Temperature Range"
+      },
+      "precipitation_summary": {
+        "name": "Precipitation Forecast"
+      },
+      "weather_summary": {
+        "name": "Weather Briefing"
+      }
+    }
+  }
+}
