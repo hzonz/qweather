@@ -44,10 +44,11 @@
 - [📜 版本更新历史 (CHANGELOG.md)](md/CHANGELOG.md)
 
 ## 💡 如何从原版迁移？
-1.建议在 HACS 中先卸载旧版 qweather。
-2.删除 custom_components/qweather 下的所有旧文件。
-3.安装本重构版，并强制刷新浏览器缓存 (Ctrl + F5)。
-4.由于 ID 生成逻辑已优化，您可能需要重新在仪表盘中选择新的实体。
+
+1. 建议在 HACS 中先卸载旧版 qweather。
+2. 删除 custom_components/qweather 下的所有旧文件。
+3. 安装本重构版，并强制刷新浏览器缓存 (Ctrl + F5)。
+4. 由于 ID 生成逻辑已优化，您可能需要重新在仪表盘中选择新的实体。
 
 ## 📜 声明
 
