@@ -279,8 +279,8 @@
   window.customCards = window.customCards || [];
   window.customCards.push({
     type: "qweather-card",
-    name: "和风天气",
+    name: "和风天气Pro",
     preview: true,
-    description: "实时天气简报"
+    description: "具备专业气象预警与简报的高性能Pro级卡片"
   });
 })();
