@@ -36,7 +36,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_HOST = "api.qweather.com"
-DEFAULT_NAME = "和风天气"
+DEFAULT_NAME = "和风天气Pro"
 
 class QWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """处理和风天气的配置流."""
