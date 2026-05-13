@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "配置和风天气",
+        "title": "配置和风天气Pro",
         "data": {
           "host": "API 服务器地址",
           "name": "集成名称",
