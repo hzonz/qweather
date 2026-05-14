@@ -112,7 +112,10 @@ class QWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_PROJECT_ID): str,
                 vol.Required(CONF_KEY_ID): str,
             }),
-            description_placeholders={"public_key": self._generated_public_key}
+            description_placeholders={
+                "url": "https://console.qweather.com",
+                "public_key": self._generated_public_key
+            }
         )
 
     async def _async_verify_and_create(self, config_data: dict[str, Any]) -> FlowResult:
