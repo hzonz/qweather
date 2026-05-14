@@ -3,6 +3,7 @@
   "name": "QWeather Pro",
   "codeowners": ["@hzonz"],
   "config_flow": true,
+  "dependencies": ["http"],
   "documentation": "https://github.com/hzonz/qweather",
   "integration_type": "service",
   "iot_class": "cloud_polling",
