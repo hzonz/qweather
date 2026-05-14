@@ -43,6 +43,8 @@
 - [🚀 详细配置与使用教程 (DOCS.md)](md/DOCS.md)
 - [📜 版本更新历史 (CHANGELOG.md)](md/CHANGELOG.md)
 
+## 特别感谢： 本次更新由 AI 协助完成架构优化，并基于原版 [dscao/qweather](https://github.com/dscao/qweather) 进行了深度重构。
+
 ## 💡 如何从原版迁移？
 
 1. 建议在 HACS 中先卸载旧版 qweather。
