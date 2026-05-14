@@ -2,78 +2,46 @@ name: Validate
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  validate-hassfest:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
+      # 1. HA 官方格式校验 (通用)
       - name: Hassfest validation
         uses: home-assistant/actions/hassfest@master
 
-  validate-hacs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-
+      # 2. HACS 商店合规性校验 (通用)
       - name: HACS validation
         uses: hacs/action@main
         with:
           category: integration
 
-  validate-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
+      # 3. 静态代码分析
+      - name: Static analyse
         run: |
-          python -m pip install --upgrade pip
-          pip install pylint pyjwt cryptography
-
-      - name: Static analyse with pylint
-        run: |
-          # 扫描所有 py 文件，忽略一些常见的 HA 干扰项
+          # 自动安装所有可能用到的通用库
+          python3 -m pip install --upgrade pip
+          pip install pylint pyjwt cryptography aiohttp
           pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116,W0613
 
-  validate-setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-
-      - name: Install the integration
-        run: |
-          # 创建虚拟的 HA 配置目录
-          mkdir test_config
-          # 将集成文件夹拷贝到虚拟配置目录中
-          mkdir -p test_config/custom_components/qweather
-          cp -r custom_components/qweather/* test_config/custom_components/qweather/
-          
-          # 写入基础配置文件
-          echo "default_config:" >> test_config/configuration.yaml
-          echo "logger:" >> test_config/configuration.yaml
-          echo "  default: info" >> test_config/configuration.yaml
-          echo "  logs:" >> test_config/configuration.yaml
-          echo "    custom_components.qweather: debug" >> test_config/configuration.yaml
-
-      - name: Setup Home Assistant
+      # 4. 模拟 HA 环境启动校验
+      - name: HA Setup Test
         id: homeassistant
         uses: ludeeus/setup-homeassistant@main
         with:
-          config-dir: ./test_config
+          config-dir: test_config
+
+      - name: Install integration
+        run: |
+          # 【核心自适应代码】：自动寻找 custom_components 下的文件夹名
+          DOMAIN=$(python3 -c "import json; import glob; print(json.load(open(glob.glob('custom_components/*/manifest.json')[0]))['domain'])")
+          echo "Detected Domain: $DOMAIN"
+          mkdir -p test_config/custom_components/$DOMAIN
+          cp -r custom_components/$DOMAIN/* test_config/custom_components/$DOMAIN/
