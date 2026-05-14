@@ -1,6 +1,6 @@
 {
   "domain": "qweather",
-  "name": "QWeather Pro (和风天气 Pro)",
+  "name": "QWeather Pro",
   "version": "1.0.0",
   "codeowners": ["@hzonz"],
   "config_flow": true,
