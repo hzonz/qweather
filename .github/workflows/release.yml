@@ -1,8 +1,10 @@
-name: Auto Release Draft
+name: Auto Release Draft (Strict Version Check)
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'custom_components/**/manifest.json'
 
 permissions:
   contents: write
@@ -14,39 +16,68 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 必须获取所有历史和标签
 
-      - name: Get Info
-        id: info
+      - name: Version Increment Check
+        id: check
         run: |
-          # 1. 获取版本号
-          VERSION=$(python3 -c "import json; print(json.load(open('custom_components/qweather/manifest.json'))['version'])")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # 1. 自动定位集成目录和 manifest 文件
+          MANIFEST_FILE=$(ls custom_components/*/manifest.json | head -n 1)
+          COMPONENT_NAME=$(basename $(dirname $MANIFEST_FILE))
+          NEW_VERSION=$(python3 -c "import json; print(json.load(open('$MANIFEST_FILE'))['version'])")
           
-          # 2. 获取最新提交的标题 (用于 - 后的描述)
-          COMMIT_TITLE=$(git log -1 --pretty=format:"%s")
-          echo "commit_title=$COMMIT_TITLE" >> $GITHUB_OUTPUT
+          # 2. 获取当前仓库中最新的 Tag (如果没有则默认为 v0.0.0)
+          # 注意：这里会过滤掉非 v 开头的标签
+          LATEST_TAG=$(git tag -l "v*" --sort=-v:refname | head -n 1)
+          if [ -z "$LATEST_TAG" ]; then LATEST_TAG="v0.0.0"; fi
+          OLD_VERSION=${LATEST_TAG#v} # 去掉 v 前缀
 
-          # 3. 判断是否为预览版
-          if [[ $VERSION == *"beta"* ]] || [[ $VERSION == *"rc"* ]] || [[ $VERSION == *"alpha"* ]]; then
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          echo "检测到新版本: $NEW_VERSION"
+          echo "检测到旧版本: $OLD_VERSION"
+
+          # 3. 使用 Python 进行语义化版本比较 (严格检查 NEW > OLD)
+          # packaging.version 是最稳妥的比较方式
+          python3 -m pip install packaging
+          IS_INCREASED=$(python3 -c "from packaging import version; print(version.parse('$NEW_VERSION') > version.parse('$OLD_VERSION'))")
+
+          if [ "$IS_INCREASED" = "True" ]; then
+            echo "compare_result=success" >> $GITHUB_OUTPUT
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "comp_name=$COMPONENT_NAME" >> $GITHUB_OUTPUT
+            
+            # 获取最新 Commit 标题作为 Release 标题的一部分
+            COMMIT_TITLE=$(git log -1 --pretty=format:"%s")
+            echo "commit_title=$COMMIT_TITLE" >> $GITHUB_OUTPUT
+
+            # 判断是否为预览版
+            if [[ $NEW_VERSION == *"beta"* ]] || [[ $NEW_VERSION == *"rc"* ]] || [[ $NEW_VERSION == *"alpha"* ]]; then
+              echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            else
+              echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "compare_result=skip" >> $GITHUB_OUTPUT
+            echo "❌ 错误：新版本 $NEW_VERSION 并不大于旧版本 $OLD_VERSION。跳过发布。"
           fi
 
-      - name: Create ZIP
+      - name: Create ZIP file
+        if: steps.check.outputs.compare_result == 'success'
         run: |
-          cd ${{ github.workspace }}/custom_components/qweather
-          zip -r ../../qweather.zip .
+          cd custom_components/${{ steps.check.outputs.comp_name }}
+          zip -r ../../${{ steps.check.outputs.comp_name }}.zip .
 
-      - name: Create Release Draft
+      - name: Create GitHub Release Draft
+        if: steps.check.outputs.compare_result == 'success'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.info.outputs.version }}
-          name: v${{ steps.info.outputs.version }} - ${{ steps.info.outputs.commit_title }}
-          files: qweather.zip
+          tag_name: v${{ steps.check.outputs.version }}
+          # 按照你的习惯：v1.0.0 - 标题内容
+          name: v${{ steps.check.outputs.version }} - ${{ steps.check.outputs.commit_title }}
+          files: |
+            ${{ steps.check.outputs.comp_name }}.zip
           draft: true
-          prerelease: ${{ steps.info.outputs.is_prerelease }}
+          prerelease: ${{ steps.check.outputs.is_prerelease }}
           generate_release_notes: true
+          target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
