@@ -27,7 +27,7 @@
 
 1. 在HACS的"集成"部分，点击右上角的三点菜单
 2. 选择"自定义存储库"
-3. 在存储库字段输入：`https://github.com/hzonz/qweather`
+3. 在存储库字段输入：`https://github.com/hzonz/qweather_pro`
 4. 类别选择"集成"
 5. 点击"添加"保存
 6. 在HACS中找到"和风天气Pro"集成并点击安装
@@ -35,7 +35,7 @@
 
 ### 手动安装
 
-1. 下载最新的: `https://github.com/hzonz/qweather`
+1. 下载最新的: `https://github.com/hzonz/qweather_pro`
 2. 解压并将`custom_components/qweather`文件夹放入Home Assistant的`custom_components`目录
 3. 重启Home Assistant
 
