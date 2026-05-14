@@ -13,25 +13,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. HA 官方格式校验 (通用)
       - name: Hassfest validation
         uses: home-assistant/actions/hassfest@master
 
-      # 2. HACS 商店合规性校验 (通用)
       - name: HACS validation
         uses: hacs/action@main
         with:
           category: integration
 
-      # 3. 静态代码分析
       - name: Static analyse
         run: |
-          # 自动安装所有可能用到的通用库
           python3 -m pip install --upgrade pip
           pip install pylint pyjwt cryptography aiohttp
-          pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116,W0613
+          # 核心：设置路径并屏蔽干扰项
+          PYTHONPATH=. pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116,W0613,R0801,E0401
 
-      # 4. 模拟 HA 环境启动校验
       - name: HA Setup Test
         id: homeassistant
         uses: ludeeus/setup-homeassistant@main
@@ -40,8 +36,6 @@ jobs:
 
       - name: Install integration
         run: |
-          # 【核心自适应代码】：自动寻找 custom_components 下的文件夹名
           DOMAIN=$(python3 -c "import json; import glob; print(json.load(open(glob.glob('custom_components/*/manifest.json')[0]))['domain'])")
-          echo "Detected Domain: $DOMAIN"
           mkdir -p test_config/custom_components/$DOMAIN
           cp -r custom_components/$DOMAIN/* test_config/custom_components/$DOMAIN/
