@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import homeassistant.helpers.config_validation as cv
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
@@ -16,6 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # 定义类型别名
 type QWeatherConfigEntry = ConfigEntry[QWeatherUpdateCoordinator]
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 from .coordinator import QWeatherUpdateCoordinator
 
