@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+# 必须声明权限，否则无法上传资源
+permissions:
+  contents: write
+
+jobs:
+  release-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create ZIP file
+        run: |
+          # 确保进入你的集成目录名 qweather
+          cd ${{ github.workspace }}/custom_components/qweather
+          # 将当前文件夹内容打包成 qweather.zip
+          zip -r ../../qweather.zip .
+
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: qweather.zip
+          asset_name: qweather.zip
+          tag: ${{ github.ref }}
+          overwrite: true
