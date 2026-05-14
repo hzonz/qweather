@@ -1,0 +1,79 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master
+
+  validate-hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+
+  validate-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint pyjwt cryptography
+
+      - name: Static analyse with pylint
+        run: |
+          # 扫描所有 py 文件，忽略一些常见的 HA 干扰项
+          pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116,W0613
+
+  validate-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install the integration
+        run: |
+          # 创建虚拟的 HA 配置目录
+          mkdir test_config
+          # 将集成文件夹拷贝到虚拟配置目录中
+          mkdir -p test_config/custom_components/qweather
+          cp -r custom_components/qweather/* test_config/custom_components/qweather/
+          
+          # 写入基础配置文件
+          echo "default_config:" >> test_config/configuration.yaml
+          echo "logger:" >> test_config/configuration.yaml
+          echo "  default: info" >> test_config/configuration.yaml
+          echo "  logs:" >> test_config/configuration.yaml
+          echo "    custom_components.qweather: debug" >> test_config/configuration.yaml
+
+      - name: Setup Home Assistant
+        id: homeassistant
+        uses: ludeeus/setup-homeassistant@main
+        with:
+          config-dir: ./test_config
