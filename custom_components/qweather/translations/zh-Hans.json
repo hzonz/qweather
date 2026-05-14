@@ -13,7 +13,7 @@
       },
       "jwt_setup": {
         "title": "配置 JWT 安全认证",
-        "description": "系统已为您自动生成公钥。\n\n**操作步骤：**\n1. 复制下方框中的**公钥**。\n2. 前往[和风天气控制台](https://console.qweather.com)，在项目中添加凭据，选择 **JSON Web Token** 并粘贴公钥。\n\n```text\n{public_key}\n```\n\n完成后，填写下方的 **项目ID** 和 **凭据ID**。",
+        "description": "系统已为您自动生成公钥。\n\n**操作步骤：**\n1. 复制下方框中的**公钥**。\n2. 前往[和风天气控制台](url)，在项目中添加凭据，选择 **JSON Web Token** 并粘贴公钥。\n\n```text\n{public_key}\n```\n\n完成后，填写下方的 **项目ID** 和 **凭据ID**。",
         "data": {
           "project_id": "项目 ID (Project ID)",
           "key_id": "凭据 ID (Key ID)"
