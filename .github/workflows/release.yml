@@ -2,60 +2,51 @@ name: Auto Release Draft
 
 on:
   push:
-    branches:
-      - main  # 监听从 beta 合并到 main 的动作
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
-  build-release:
+  build-and-draft:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 必须获取完整历史，否则无法自动生成发布说明
+          fetch-depth: 0
 
-      - name: Get Version from manifest.json
-        id: get_version
+      - name: Get Info
+        id: info
         run: |
+          # 1. 获取版本号
           VERSION=$(python3 -c "import json; print(json.load(open('custom_components/qweather/manifest.json'))['version'])")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
-          # 判断是否是预览版
+          # 2. 获取最新提交的标题 (用于 - 后的描述)
+          COMMIT_TITLE=$(git log -1 --pretty=format:"%s")
+          echo "commit_title=$COMMIT_TITLE" >> $GITHUB_OUTPUT
+
+          # 3. 判断是否为预览版
           if [[ $VERSION == *"beta"* ]] || [[ $VERSION == *"rc"* ]] || [[ $VERSION == *"alpha"* ]]; then
             echo "is_prerelease=true" >> $GITHUB_OUTPUT
           else
             echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check if Tag exists
-        id: check_tag
-        run: |
-          TAG_NAME="v${{ steps.get_version.outputs.version }}"
-          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "版本 $TAG_NAME 已存在，跳过本次流程。"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create ZIP file
-        if: steps.check_tag.outputs.exists == 'false'
+      - name: Create ZIP
         run: |
           cd ${{ github.workspace }}/custom_components/qweather
           zip -r ../../qweather.zip .
 
-      - name: Create GitHub Release Draft
-        if: steps.check_tag.outputs.exists == 'false'
+      - name: Create Release Draft
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: QWeather Pro v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.info.outputs.version }}
+          name: v${{ steps.info.outputs.version }} - ${{ steps.info.outputs.commit_title }}
           files: qweather.zip
-          draft: true  # 【核心修改】：发布为草稿，不直接公开
-          prerelease: ${{ steps.get_version.outputs.is_prerelease }}
-          generate_release_notes: true # 【核心修改】：让 GitHub 自动抓取 Commit 记录写好发布说明
+          draft: true
+          prerelease: ${{ steps.info.outputs.is_prerelease }}
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
