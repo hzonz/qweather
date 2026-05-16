@@ -20,7 +20,7 @@ import jwt
 from .const import (
     DOMAIN, CONF_API_KEY, CONF_LOCATION_ID, CONF_USE_TOKEN,
     CONF_PROJECT_ID, CONF_KEY_ID, CONF_PRIVATE_KEY, CONF_UPDATE_INTERVAL,
-    SUGGESTION_TYPE_MAP, VERSION,
+    SUGGESTION_TYPE_MAP,
     CONF_DAILYSTEPS, CONF_HOURLYSTEPS, CONF_ALERT, CONF_GIRD, CONF_LIFEINDEX,
 )
 from .condition import CONDITION_MAP
@@ -36,20 +36,26 @@ TTL_AIR = 1800       # 空气质量：30分钟更新一次
 TTL_MINUTELY = 600
 
 class QWeatherUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
-    """处理带缓存逻辑的和风天气协调器."""
-
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, version: str) -> None:
+        """初始化协调器."""
         self.entry = entry
+        self.version = version  # 接收并保存来自 manifest 的版本号
         self.location = entry.data.get(CONF_LOCATION_ID)
         
-        update_interval = self.entry.options.get(CONF_UPDATE_INTERVAL, self.entry.data.get(CONF_UPDATE_INTERVAL, 15))
+        # 获取刷新间隔
+        update_interval = self.entry.options.get(
+            CONF_UPDATE_INTERVAL, 
+            self.entry.data.get(CONF_UPDATE_INTERVAL, 15)
+        )
+        
         super().__init__(
-            hass, _LOGGER, name=DOMAIN,
+            hass, 
+            _LOGGER, 
+            name=DOMAIN,
             update_interval=timedelta(minutes=update_interval),
         )
         
         self.session = async_get_clientsession(hass)
-        self.version = VERSION
         self.city_name: str | None = None
         
         # --- 缓存存储 ---
