@@ -10,8 +10,10 @@ from homeassistant.const import Platform
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.components import frontend
+from homeassistant.loader import async_get_integration  # 引入动态加载工具
 
-from .const import DOMAIN, PLATFORMS, VERSION
+from .const import DOMAIN, PLATFORMS
+from .coordinator import QWeatherUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,15 +21,18 @@ _LOGGER = logging.getLogger(__name__)
 type QWeatherConfigEntry = ConfigEntry[QWeatherUpdateCoordinator]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-from .coordinator import QWeatherUpdateCoordinator
-
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """初始化集成（不支持 YAML）。"""
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: QWeatherConfigEntry) -> bool:
     """从配置条目设置集成."""
     
-    # 1. 动态获取物理路径 (指向到 local 这一层)
+    # 1. 动态获取 manifest.json 信息 (包括版本号)
+    integration = await async_get_integration(hass, DOMAIN)
+    version = integration.version
+    
+    # 2. 动态获取物理路径并注册静态资源
     base_path = os.path.dirname(__file__)
     local_path = os.path.join(base_path, "local")
     
@@ -37,29 +42,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: QWeatherConfigEntry) -> 
             StaticPathConfig("/qweather-local", local_path, False)
         ])
         
-        # 【关键修复】：根据你的目录结构，文件在 local/qweather-card/ 目录下
-        # 所以注入 URL 必须包含 qweather-card
-        js_url_card = f"/qweather-local/qweather-card/qweather-card.js?v={VERSION}"
-        js_url_info = f"/qweather-local/qweather-card/qweather-more-info.js?v={VERSION}"
+        # 使用从 manifest 获取的 version 注入 URL，防止前端缓存旧版 JS
+        js_url_card = f"/qweather-local/qweather-card/qweather-card.js?v={version}"
+        js_url_info = f"/qweather-local/qweather-card/qweather-more-info.js?v={version}"
         
         frontend.add_extra_js_url(hass, js_url_card)
         frontend.add_extra_js_url(hass, js_url_info)
         
-        _LOGGER.info("和风天气：已注入 JS 资源 - %s", js_url_card)
+        _LOGGER.info("和风天气 (版本 %s)：已注入 Lovelace JS 资源", version)
     else:
         _LOGGER.error("和风天气：无法找到 local 文件夹，路径应为: %s", local_path)
 
-    # 2. 初始化协调器
-    coordinator = QWeatherUpdateCoordinator(hass, entry)
+    # 3. 初始化协调器 (将 version 传入)
+    # 注意：请确保你的 coordinator.py 中的 __init__ 接收 version 参数
+    coordinator = QWeatherUpdateCoordinator(hass, entry, version)
     
-    # 3. 执行第一次刷新
+    # 4. 执行第一次刷新
     try:
         await coordinator.async_config_entry_first_refresh()
     except Exception as err:
-        _LOGGER.warning("和风天气：初始数据获取失败 (可能是网络问题): %s", err)
+        _LOGGER.warning("和风天气：初始数据获取失败 (请检查网络或 API Key): %s", err)
 
+    # 5. 存储协调器数据并加载平台
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # 6. 注册选项更新监听器
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
     return True
