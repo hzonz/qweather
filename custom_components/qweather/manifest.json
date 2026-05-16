@@ -1,6 +1,6 @@
 {
   "domain": "qweather",
-  "name": "QWeather Pro",
+  "name": "和风天气 Pro",
   "codeowners": ["@hzonz"],
   "config_flow": true,
   "dependencies": ["http"],
@@ -12,5 +12,5 @@
     "PyJWT>=2.4.0",
     "cryptography>=41.0.0"
   ],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

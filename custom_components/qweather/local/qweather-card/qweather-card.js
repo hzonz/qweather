@@ -22,7 +22,7 @@
       };
     }
 
-    static getStubConfig() { return { entity: "weather.tian_qi" }; }
+    static getStubConfig() { return { entity: "weather.qweather_pro_weather" }; }
 
     constructor() {
       super();
@@ -33,7 +33,7 @@
     }
 
     setConfig(config) {
-      this.config = { entity: "weather.tian_qi", ...config };
+      this.config = { entity: "weather.qweather_pro_weather", ...config };
     }
 
     set hass(hass) {

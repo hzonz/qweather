@@ -13,7 +13,7 @@
       },
       "jwt_setup": {
         "title": "JWT Security Configuration",
-        "description": "The system has generated a public key for you.\n\n1. Copy the **Public Key** below.\n2. Add it to [QWeather Console](url) as a **JSON Web Token** credential.\n\n```text\n{public_key}\n```\n\nThen enter the IDs below.",
+        "description": "The system has generated a public key for you.\n\n1. Copy the **Public Key** below.\n2. Add it to [QWeather Console](https://console.qweather.com) as a **JSON Web Token** credential.\n\n```text\n{public_key}\n```\n\nThen enter the IDs below.",
         "data": {
           "project_id": "Project ID",
           "key_id": "Key ID"
@@ -31,6 +31,7 @@
       "already_configured": "This location is already configured."
     }
   },
+
   "options": {
     "step": {
       "init": {
@@ -48,6 +49,7 @@
       }
     }
   },
+
   "entity": {
     "sensor": {
       "aqi": {
@@ -64,6 +66,12 @@
       },
       "weather_summary": {
         "name": "Weather Briefing"
+      }
+    },
+
+    "weather": {
+      "weather": {
+        "name": "Weather"
       }
     }
   }

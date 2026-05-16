@@ -13,7 +13,7 @@
       },
       "jwt_setup": {
         "title": "配置 JWT 安全认证",
-        "description": "系统已为您自动生成公钥。\n\n**操作步骤：**\n1. 复制下方框中的**公钥**。\n2. 前往[和风天气控制台](url)，在项目中添加凭据，选择 **JSON Web Token** 并粘贴公钥。\n\n```text\n{public_key}\n```\n\n完成后，填写下方的 **项目ID** 和 **凭据ID**。",
+        "description": "系统已为您自动生成公钥。\n\n**操作步骤：**\n1. 复制下方框中的**公钥**。\n2. 前往[和风天气控制台](https://console.qweather.com)，在项目中添加凭据，选择 **JSON Web Token** 并粘贴公钥。\n\n```text\n{public_key}\n```\n\n完成后，填写下方的 **项目ID** 和 **凭据ID**。",
         "data": {
           "project_id": "项目 ID (Project ID)",
           "key_id": "凭据 ID (Key ID)"
@@ -31,6 +31,7 @@
       "already_configured": "该地理位置已被配置"
     }
   },
+
   "options": {
     "step": {
       "init": {
@@ -48,13 +49,30 @@
       }
     }
   },
+
   "entity": {
     "sensor": {
-      "aqi": { "name": "空气质量" },
-      "warning_count": { "name": "气象预警" },
-      "today_temp_range": { "name": "今日温度范围" },
-      "precipitation_summary": { "name": "降水简报" },
-      "weather_summary": { "name": "天气概况" }
+      "aqi": {
+        "name": "空气质量"
+      },
+      "warning_count": {
+        "name": "气象预警"
+      },
+      "today_temp_range": {
+        "name": "今日温度范围"
+      },
+      "precipitation_summary": {
+        "name": "降水简报"
+      },
+      "weather_summary": {
+        "name": "天气概况"
+      }
+    },
+
+    "weather": {
+      "weather": {
+        "name": "天气"
+      }
     }
   }
 }
